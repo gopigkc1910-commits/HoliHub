@@ -583,6 +583,47 @@ input[type="range"] {
   50% { transform: scale(1.015); }
 }
 
+.preview-card {
+  margin-top: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.14);
+  padding: 12px;
+}
+
+.preview-title {
+  margin: 0 0 6px;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.preview-text {
+  margin: 0;
+  color: var(--muted);
+}
+
+.preview-meta {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+#greetingSection {
+  display: none;
+}
+
+body.wish-mode #greetingSection {
+  display: block;
+  grid-column: 1 / -1;
+}
+
+body.wish-mode #builderSection,
+body.wish-mode #recentSection,
+body.wish-mode #musicSearchSection,
+body.wish-mode #musicSection {
+  display: none;
+}
+
 .credit-3d {
   margin-top: 8px;
   padding: 16px;
@@ -727,13 +768,14 @@ input[type="range"] {
 
 <div class="page">
   <div class="container">
-    <section class="card hero">
+    <section class="card hero" id="builderSection">
       <div class="hero-top">
         <h1 id="title"></h1>
         <span class="tag" id="festivalTag">FestivalHub 2026</span>
       </div>
       <p>Create beautiful festival greetings with music, colors, animation, and mobile-first sharing.</p>
       <div class="form-grid" style="margin-top:12px;">
+        <input id="senderInput" type="text" placeholder="Your name (sender)">
         <input id="nameInput" type="text" placeholder="Enter friend name">
         <select id="festivalInput" aria-label="Festival">
           <option value="Holi">Holi</option>
@@ -741,6 +783,8 @@ input[type="range"] {
           <option value="Eid">Eid</option>
           <option value="Christmas">Christmas</option>
           <option value="New Year">New Year</option>
+          <option value="Birthday">Birthday</option>
+          <option value="Independence Day">Independence Day</option>
           <option value="Raksha Bandhan">Raksha Bandhan</option>
         </select>
         <input id="spotifyInput" type="text" placeholder="Music or song query">
@@ -768,13 +812,35 @@ input[type="range"] {
       </div>
       <div id="shareStatus" class="meta-line" style="margin-top:10px;">Share link not generated yet.</div>
       <div id="statsLine" class="meta-line"></div>
+      <div class="preview-card" id="previewCard">
+        <h3 class="preview-title" id="previewTitle">Happy Holi, Friend!</h3>
+        <p class="preview-text" id="previewMessage">Your message preview appears here.</p>
+        <div class="preview-meta" id="previewMeta">From: You | Music: Not selected</div>
+      </div>
       <div class="countdown-card">
         <div id="countdown"></div>
       </div>
       <div id="thought"></div>
     </section>
 
-    <section class="card">
+    <section class="card" id="greetingSection">
+      <h2 id="wishOpenTitle">Festival Greeting</h2>
+      <div class="preview-card">
+        <h3 class="preview-title" id="wishTitle">Happy Festival!</h3>
+        <p class="preview-text" id="wishFrom">Message from Friend</p>
+        <p class="preview-text" id="wishMessage">May your day be joyful.</p>
+        <div class="preview-meta" id="wishSong">Music: Not selected</div>
+        <div class="preview-meta" id="wishViews">Opens: 0</div>
+      </div>
+      <div class="controls-row" style="margin-top:10px;">
+        <button class="primary" onclick="playGreetingSong()">Play Song</button>
+        <button onclick="shareCurrentGreeting()">Share This Greeting</button>
+        <button onclick="remixGreeting()">Remix This Greeting</button>
+        <button onclick="copyShareLink()">Copy Link</button>
+      </div>
+    </section>
+
+    <section class="card" id="musicSection">
       <h2>Custom Music Player</h2>
       <div class="music-head">
         <button id="musicBtn" class="play-btn" onclick="toggleMusic()" aria-label="Play or pause">
@@ -814,7 +880,7 @@ input[type="range"] {
       <audio id="audioNative" loop preload="auto" playsinline></audio>
     </section>
 
-    <section class="card">
+    <section class="card" id="musicSearchSection">
       <h2>Music Search</h2>
       <div class="spotify-row">
         <button id="spotifySearchBtn" class="primary" onclick="loadSpotify()">Search and Play</button>
@@ -839,7 +905,7 @@ input[type="range"] {
       <div id="spotifyResults" class="spotify-results"></div>
     </section>
 
-    <section class="card">
+    <section class="card" id="recentSection">
       <h2>Recent Wishes</h2>
       <div class="recent-toolbar">
         <select id="recentFestivalFilter" aria-label="Filter by festival">
@@ -849,6 +915,8 @@ input[type="range"] {
           <option value="Eid">Eid</option>
           <option value="Christmas">Christmas</option>
           <option value="New Year">New Year</option>
+          <option value="Birthday">Birthday</option>
+          <option value="Independence Day">Independence Day</option>
           <option value="Raksha Bandhan">Raksha Bandhan</option>
         </select>
         <input id="recentSearchInput" type="text" placeholder="Search name or message">
@@ -921,6 +989,13 @@ const FESTIVAL_DATES = {
     2029: "2029-12-31T00:00:00",
     2030: "2030-12-31T00:00:00"
   },
+  "Independence Day": {
+    2026: "2026-08-15T00:00:00",
+    2027: "2027-08-15T00:00:00",
+    2028: "2028-08-15T00:00:00",
+    2029: "2029-08-15T00:00:00",
+    2030: "2030-08-15T00:00:00"
+  },
   "Raksha Bandhan": {
     2026: "2026-08-28T00:00:00",
     2027: "2027-08-17T00:00:00",
@@ -935,6 +1010,17 @@ const THEME_MAP = {
   sunset: ["#f97316", "#fb7185", "#f59e0b", "#38bdf8"],
   emerald: ["#064e3b", "#10b981", "#34d399", "#0f766e"],
   royal: ["#1e1b4b", "#4c1d95", "#0284c7", "#0f172a"]
+};
+
+const FESTIVAL_EMOJI = {
+  "Holi": "🌈",
+  "Diwali": "🪔",
+  "Eid": "🌙",
+  "Christmas": "🎄",
+  "New Year": "🎆",
+  "Birthday": "🎂",
+  "Independence Day": "🇮🇳",
+  "Raksha Bandhan": "🎁"
 };
 
 const THOUGHTS_BY_FESTIVAL = {
@@ -963,6 +1049,16 @@ const THOUGHTS_BY_FESTIVAL = {
     "May this year bring growth, health, and joy.",
     "Wishing you a bright and successful New Year."
   ],
+  "Birthday": [
+    "Wishing you a very happy birthday filled with joy.",
+    "May your year ahead be full of success and smiles.",
+    "Celebrate today and make memories forever."
+  ],
+  "Independence Day": [
+    "Proud to celebrate freedom, unity, and progress.",
+    "Wishing you a meaningful Independence Day.",
+    "Honor the nation with hope and positivity."
+  ],
   "Raksha Bandhan": [
     "Celebrating the beautiful bond of siblings.",
     "Wishing love, care, and lifelong protection.",
@@ -979,13 +1075,18 @@ const FALLBACK_AUDIO = [
 // ---------- Title and URL params ----------
 const params = new URLSearchParams(window.location.search);
 const titleEl = document.getElementById("title");
+const senderInput = document.getElementById("senderInput");
 const nameInput = document.getElementById("nameInput");
 const messageInput = document.getElementById("messageInput");
 const festivalInput = document.getElementById("festivalInput");
 const themeInput = document.getElementById("themeInput");
 const festivalTag = document.getElementById("festivalTag");
 const spotifyInput = document.getElementById("spotifyInput");
+const previewTitle = document.getElementById("previewTitle");
+const previewMessage = document.getElementById("previewMessage");
+const previewMeta = document.getElementById("previewMeta");
 let generatedShareLink = "";
+let activeWishId = "";
 
 function normalizeBase(urlLike) {
   if (!urlLike) return "";
@@ -1027,6 +1128,7 @@ function typeTitle(text) {
 }
 
 const nameFromUrl = params.get("name") || "";
+const senderFromUrl = params.get("from") || "";
 const festivalFromUrl = params.get("festival") || "Holi";
 const messageFromUrl = params.get("message") || "";
 const themeFromUrl = params.get("theme") || "holi";
@@ -1037,11 +1139,13 @@ if (festivalInput.querySelector(`option[value="${festivalFromUrl}"]`)) {
 if (themeInput.querySelector(`option[value="${themeFromUrl}"]`)) {
   themeInput.value = themeFromUrl;
 }
+if (senderFromUrl) senderInput.value = senderFromUrl;
 if (nameFromUrl) nameInput.value = nameFromUrl;
 if (messageFromUrl) messageInput.value = messageFromUrl;
 updateFestivalUi();
 applyTheme(themeInput.value);
 updateTitle();
+updatePreviewCard();
 
 if (params.get("spotify")) spotifyInput.value = params.get("spotify");
 if (params.get("song")) spotifyInput.value = params.get("song");
@@ -1053,19 +1157,32 @@ festivalInput.addEventListener("change", () => {
   updateFestivalUi();
   updateThoughtText();
   updateTitle();
+  updatePreviewCard();
   tickCountdown();
   saveDraft();
 });
 themeInput.addEventListener("change", () => {
   applyTheme(themeInput.value);
+  updatePreviewCard();
+  saveDraft();
+});
+senderInput.addEventListener("input", () => {
+  updatePreviewCard();
   saveDraft();
 });
 nameInput.addEventListener("input", () => {
   updateTitle();
+  updatePreviewCard();
   saveDraft();
 });
-messageInput.addEventListener("input", saveDraft);
-spotifyInput.addEventListener("input", saveDraft);
+messageInput.addEventListener("input", () => {
+  updatePreviewCard();
+  saveDraft();
+});
+spotifyInput.addEventListener("input", () => {
+  updatePreviewCard();
+  saveDraft();
+});
 
 function updateTitle() {
   const n = nameInput.value.trim();
@@ -1081,6 +1198,18 @@ function updateTitle() {
 function updateFestivalUi() {
   const f = festivalInput.value || "Holi";
   festivalTag.textContent = f + " Edition";
+}
+
+function updatePreviewCard() {
+  const festival = festivalInput.value || "Festival";
+  const emoji = FESTIVAL_EMOJI[festival] || "🎉";
+  const friend = nameInput.value.trim() || "Friend";
+  const sender = senderInput.value.trim() || "You";
+  const msg = messageInput.value.trim() || ("Wishing you joy and success. Happy " + festival + "!");
+  const song = spotifyInput.value.trim() || "Not selected";
+  if (previewTitle) previewTitle.textContent = emoji + " Happy " + festival + ", " + friend + "!";
+  if (previewMessage) previewMessage.textContent = "\"" + msg + "\"";
+  if (previewMeta) previewMeta.textContent = "From: " + sender + " | Music: " + song;
 }
 
 function getFestivalThoughts() {
@@ -1159,10 +1288,12 @@ async function generateLink() {
   }
 
   const selectedFestival = festivalInput.value || "Holi";
+  const selectedSender = senderInput.value.trim();
   const selectedName = nameInput.value.trim();
   const selectedMessage = messageInput.value.trim() || ("Wishing you joy and success. Happy " + selectedFestival + (selectedName ? ", " + selectedName : "") + "!");
   const payload = {
     festival: selectedFestival,
+    senderName: selectedSender,
     friendName: selectedName,
     message: selectedMessage,
     music: spotifyInput.value.trim(),
@@ -1185,6 +1316,7 @@ async function generateLink() {
     const url = new URL(base + "/");
     url.pathname = "/wish/" + fallbackId;
     url.searchParams.set("festival", payload.festival);
+    if (payload.senderName) url.searchParams.set("from", payload.senderName);
     if (payload.friendName) url.searchParams.set("name", payload.friendName);
     if (payload.message) url.searchParams.set("message", payload.message);
     if (payload.music) url.searchParams.set("song", payload.music);
@@ -1236,7 +1368,10 @@ async function loadWishByPathIfNeeded() {
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
+    document.body.classList.add("wish-mode");
+    activeWishId = id;
     festivalInput.value = data.festival || "Holi";
+    senderInput.value = data.senderName || "";
     nameInput.value = data.friendName || "";
     messageInput.value = data.message || "";
     spotifyInput.value = data.music || "";
@@ -1246,9 +1381,58 @@ async function loadWishByPathIfNeeded() {
     }
     updateFestivalUi();
     updateTitle();
+    updatePreviewCard();
     generatedShareLink = window.location.origin + "/wish/" + id;
     if (data.message) messageInput.value = data.message;
+    const wishTitle = document.getElementById("wishTitle");
+    const wishFrom = document.getElementById("wishFrom");
+    const wishMessage = document.getElementById("wishMessage");
+    const wishSong = document.getElementById("wishSong");
+    const wishViews = document.getElementById("wishViews");
+    const wishOpenTitle = document.getElementById("wishOpenTitle");
+    const emoji = FESTIVAL_EMOJI[data.festival] || "🎉";
+    const views = Number(data.views || 0);
+    const viewsLabel = views === 1 ? "person" : "people";
+    if (wishOpenTitle) wishOpenTitle.textContent = (data.festival || "Festival") + " Greeting";
+    if (wishTitle) wishTitle.textContent = emoji + " Happy " + (data.festival || "Festival") + ", " + (data.friendName || "Friend") + "!";
+    if (wishFrom) wishFrom.textContent = "Message from " + (data.senderName || "Friend");
+    if (wishMessage) wishMessage.textContent = "\"" + (data.message || "Wishing you joy and happiness.") + "\"";
+    if (wishSong) wishSong.textContent = "Music: " + (data.music || "Not selected");
+    if (wishViews) wishViews.textContent = "👀 " + views + " " + viewsLabel + " viewed this greeting";
+    colorSplashAnimation();
+    fireworks();
   } catch (_) {}
+}
+
+function playGreetingSong() {
+  if (!spotifyInput.value.trim()) {
+    shareStatus.textContent = "No song attached to this greeting.";
+    return;
+  }
+  loadSpotify();
+  shareStatus.textContent = "Playing greeting song...";
+}
+
+function remixGreeting() {
+  const root = window.location.origin + "/";
+  const url = new URL(root);
+  url.searchParams.set("festival", festivalInput.value || "Holi");
+  if (senderInput.value.trim()) url.searchParams.set("from", senderInput.value.trim());
+  if (nameInput.value.trim()) url.searchParams.set("name", nameInput.value.trim());
+  if (messageInput.value.trim()) url.searchParams.set("message", messageInput.value.trim());
+  if (spotifyInput.value.trim()) url.searchParams.set("song", spotifyInput.value.trim());
+  if (themeInput.value.trim()) url.searchParams.set("theme", themeInput.value.trim());
+  window.location.href = url.toString();
+}
+
+function shareCurrentGreeting() {
+  if (!activeWishId) {
+    shareStatus.textContent = "Open a greeting first to share it.";
+    return;
+  }
+  const link = publicWishLink(activeWishId) || (window.location.origin + "/wish/" + activeWishId);
+  const text = encodeURIComponent("Check this festival greeting: " + link);
+  window.open("https://wa.me/?text=" + text, "_blank");
 }
 
 async function refreshStats() {
@@ -1423,6 +1607,7 @@ if (recentSearchInput) {
 function saveDraft() {
   try {
     const draft = {
+      senderName: senderInput.value || "",
       friendName: nameInput.value || "",
       festival: festivalInput.value || "Holi",
       message: messageInput.value || "",
@@ -1437,6 +1622,7 @@ function clearDraft() {
   try {
     localStorage.removeItem(DRAFT_KEY);
   } catch (_) {}
+  senderInput.value = "";
   nameInput.value = "";
   messageInput.value = "";
   spotifyInput.value = "";
@@ -1445,6 +1631,7 @@ function clearDraft() {
   applyTheme("holi");
   updateFestivalUi();
   updateTitle();
+  updatePreviewCard();
   updateThoughtText();
   tickCountdown();
   shareStatus.textContent = "Draft cleared.";
@@ -1478,6 +1665,7 @@ function restoreDraftIfNeeded() {
     if (!raw) return;
     const draft = JSON.parse(raw);
     if (!draft || typeof draft !== "object") return;
+    if (draft.senderName) senderInput.value = String(draft.senderName);
     if (draft.friendName) nameInput.value = String(draft.friendName);
     if (draft.message) messageInput.value = String(draft.message);
     if (draft.music) spotifyInput.value = String(draft.music);
@@ -1490,6 +1678,7 @@ function restoreDraftIfNeeded() {
     }
     updateFestivalUi();
     updateTitle();
+    updatePreviewCard();
     tickCountdown();
   } catch (_) {}
 }
@@ -1518,7 +1707,8 @@ async function generateAiMessage() {
 
 // ---------- Countdown ----------
 function nextFestivalTs(festival) {
-  const calendar = FESTIVAL_DATES[festival] || FESTIVAL_DATES.Holi;
+  const calendar = FESTIVAL_DATES[festival];
+  if (!calendar) return 0;
   const now = new Date();
   let year = now.getFullYear();
   while (!calendar[year] || new Date(calendar[year]) <= now) year += 1;
@@ -1530,6 +1720,10 @@ const countdownEl = document.getElementById("countdown");
 function tickCountdown() {
   const festival = festivalInput.value || "Holi";
   const eventTime = nextFestivalTs(festival);
+  if (!eventTime) {
+    countdownEl.textContent = "Set your custom event date for " + festival + ".";
+    return;
+  }
   const gap = eventTime - Date.now();
   if (gap <= 0) {
     countdownEl.textContent = "It's " + festival + " today!";

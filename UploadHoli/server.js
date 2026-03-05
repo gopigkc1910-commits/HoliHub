@@ -400,11 +400,13 @@ app.post("/api/wishes", (req, res) => {
   let id = makeWishId();
   while (wishesStore.has(id)) id = makeWishId();
   const festival = trimText(body.festival || "Holi", 40) || "Holi";
+  const senderName = trimText(body.senderName || "", 80);
   const friendName = trimText(body.friendName, 80);
   const defaultMessage = `Wishing you joy and success. Happy ${festival}${friendName ? ", " + friendName : ""}!`;
   const wish = {
     id,
     festival,
+    senderName,
     friendName,
     message: trimText(body.message || defaultMessage, 400),
     music: trimText(body.music, 200),
@@ -448,6 +450,7 @@ app.get("/api/wishes", (req, res) => {
     .map((wish) => ({
       id: wish.id,
       festival: wish.festival,
+      senderName: wish.senderName || "",
       friendName: wish.friendName,
       message: wish.message,
       theme: wish.theme,
