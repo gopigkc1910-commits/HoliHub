@@ -90,7 +90,7 @@ async function search() {
   resultsEl.innerHTML = "";
 
   try {
-    const res = await fetch("/api/spotify/search?q=" + encodeURIComponent(q));
+    const res = await fetch("/api/music/search?q=" + encodeURIComponent(q));
     const data = await res.json();
 
     if (!res.ok) {
@@ -123,7 +123,7 @@ async function search() {
     });
   } catch (err) {
     statusEl.textContent = "Error: " + (err.message || "Could not fetch songs");
-    resultsEl.innerHTML = "<p>Failed to load songs. Check backend and Spotify credentials.</p>";
+    resultsEl.innerHTML = "<p>Failed to load songs. Check backend and internet connection.</p>";
   }
 }
 </script>
