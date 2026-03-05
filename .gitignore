@@ -1,0 +1,6 @@
+.env
+server_err.log
+server_out.log
+vscode
+node_modules/
+UploadHoli/node_modules/

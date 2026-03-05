@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Music Search</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+}
+
+input{
+    padding:10px;
+    width:250px;
+    border-radius:5px;
+    border:none;
+}
+
+button{
+    padding:10px 20px;
+    background:#1db954;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+#results{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    padding:20px;
+}
+
+.card{
+    background:#222;
+    padding:15px;
+    border-radius:10px;
+}
+
+.card img{
+    width:100%;
+    border-radius:10px;
+}
+
+.card a{
+    color:#1db954;
+    text-decoration:none;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🎵 Music Search</h1>
+
+<input id="query" placeholder="Search song...">
+<button onclick="search()">Search</button>
+
+<div id="results"></div>
+
+<script>
+
+async function search(){
+
+    const q = document.getElementById("query").value;
+
+    if(!q){
+        alert("Enter song name");
+        return;
+    }
+
+    const res = await fetch("/api/spotify/search?q="+encodeURIComponent(q));
+    const data = await res.json();
+
+    const results = document.getElementById("results");
+    results.innerHTML="";
+
+    if(!data.items || data.items.length===0){
+        results.innerHTML="<p>No results found</p>";
+        return;
+    }
+
+    data.items.forEach(song=>{
+
+        const card=document.createElement("div");
+        card.className="card";
+
+        card.innerHTML=`
+            <img src="${song.image}">
+            <h3>${song.name}</h3>
+            <p>${song.artist}</p>
+            <a href="${song.url}" target="_blank">Open in Spotify</a>
+        `;
+
+        results.appendChild(card);
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>

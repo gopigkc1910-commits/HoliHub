@@ -1,0 +1,1740 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holi Celebration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+
+:root {
+  --bg1: #ff4d6d;
+  --bg2: #ffbe0b;
+  --bg3: #00c897;
+  --bg4: #219ebc;
+  --card: rgba(255, 255, 255, 0.16);
+  --text: #ffffff;
+  --accent: #ffd166;
+  --muted: rgba(255, 255, 255, 0.82);
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  --ring: rgba(255, 255, 255, 0.45);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  overflow-x: hidden;
+  background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+  background-size: 350% 350%;
+  animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-blobs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-blobs span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(4px);
+  opacity: 0.28;
+  animation: float 11s ease-in-out infinite;
+}
+
+.bg-blobs span:nth-child(1) { width: 240px; height: 240px; top: 8%; left: 6%; background: #ff9f1c; }
+.bg-blobs span:nth-child(2) { width: 280px; height: 280px; top: 62%; left: 70%; background: #2ec4b6; animation-delay: 1.7s; }
+.bg-blobs span:nth-child(3) { width: 200px; height: 200px; top: 25%; left: 78%; background: #e71d36; animation-delay: 3.1s; }
+.bg-blobs span:nth-child(4) { width: 220px; height: 220px; top: 72%; left: 12%; background: #8338ec; animation-delay: 2.2s; }
+
+@keyframes float {
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-24px) scale(1.05); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page {
+  position: relative;
+  z-index: 2;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 14px;
+}
+
+.container {
+  width: min(1080px, 100%);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.card {
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.3);
+  border-color: var(--ring);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: "Sora", "Poppins", sans-serif;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  line-height: 1.1;
+  text-shadow: 0 0 18px rgba(255,255,255,0.72);
+}
+
+.hero p {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.controls-row,
+.spotify-row,
+.music-actions,
+.inline-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+input[type="text"] {
+  flex: 1;
+  min-width: 190px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  outline: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #1f2937;
+  background: rgba(255,255,255,0.96);
+  font-family: inherit;
+}
+
+button, .file-btn {
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: #111827;
+  background: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+button:hover, .file-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+}
+
+button.primary {
+  background: linear-gradient(135deg, #ffe66d, #ffbf69);
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-family: "Sora", "Poppins", sans-serif;
+  font-size: 1.14rem;
+}
+
+.meta-line {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.music-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  background: linear-gradient(135deg, #ffe66d, #ff7f50);
+}
+
+.play-btn.is-playing {
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 230, 109, 0.65); }
+  70% { box-shadow: 0 0 0 16px rgba(255, 230, 109, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 230, 109, 0); }
+}
+
+.track-name {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.timeline-wrap {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+}
+
+.timeline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.timeline-head strong {
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.seek-modern {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.4));
+  appearance: none;
+  outline: none;
+}
+
+.seek-modern::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe66d, #ff7f50);
+  border: 2px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.seek-modern::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe66d, #ff7f50);
+  border: 2px solid #fff;
+  cursor: pointer;
+}
+
+#timeLabel, #spotifyStatus, #musicStatus, #countdown, #thought {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.36);
+}
+
+.backend-pill {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #08210f;
+  background: #86efac;
+}
+
+.backend-pill.warn {
+  color: #3a1f00;
+  background: #fde68a;
+}
+
+.backend-pill.error {
+  color: #450a0a;
+  background: #fca5a5;
+}
+
+#spotifyFrameHost {
+  margin-top: 10px;
+  width: 100%;
+  min-height: 152px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: none;
+}
+
+.spotify-controls {
+  margin-top: 10px;
+  display: none;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sim-wrap {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.sim-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.sim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #9ca3af;
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+}
+
+.sim-dot.live {
+  background: #22c55e;
+  animation: dotPulse 1.2s infinite;
+}
+
+@keyframes dotPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.sim-bars {
+  height: 72px;
+  display: flex;
+  align-items: end;
+  gap: 5px;
+}
+
+.sim-bar {
+  flex: 1;
+  height: 12%;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #ffe66d, #ff7f50);
+  transform-origin: bottom;
+  transition: height 0.12s linear;
+}
+
+.song-label-panel {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255, 230, 109, 0.24), transparent 36%),
+    linear-gradient(140deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08));
+}
+
+.song-label-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.song-label-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.song-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #1f2937;
+  background: #fef3c7;
+}
+
+.song-label-text {
+  margin-top: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-label-hint {
+  margin-top: 4px;
+  font-size: 0.83rem;
+  color: var(--muted);
+}
+
+.spotify-results {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.spotify-result {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.spotify-result span {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.spotify-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.spotify-meta img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.spotify-title {
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+.spotify-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+#musicFile { display: none; }
+#audioNative { display: none; }
+#spotifyFallbackFrame { display: none; border: 0; width: 100%; height: 152px; border-radius: 12px; margin-top: 10px; }
+
+.footer-notes {
+  display: grid;
+  gap: 8px;
+}
+
+.credit-3d {
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  background:
+    radial-gradient(circle at 10% 15%, rgba(255, 230, 109, 0.48), transparent 40%),
+    radial-gradient(circle at 90% 85%, rgba(46, 196, 182, 0.36), transparent 42%),
+    linear-gradient(130deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.07));
+  text-align: center;
+  font-size: clamp(0.95rem, 2.6vw, 1.14rem);
+  font-weight: 800;
+  color: transparent;
+  letter-spacing: 0.6px;
+  text-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  animation: creditGlow 2.8s ease-in-out infinite;
+  will-change: transform;
+  position: relative;
+  overflow: hidden;
+}
+
+.credit-3d span {
+  display: inline-block;
+  transform: translateZ(26px);
+  background: linear-gradient(90deg, #fff6bf, #ffffff, #9bffe0, #ffffff);
+  background-size: 210% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: creditShine 2.4s linear infinite;
+}
+
+.credit-name {
+  display: block;
+  font-size: clamp(1.02rem, 2.7vw, 1.28rem);
+  letter-spacing: 0.8px;
+}
+
+.credit-tag {
+  display: block;
+  margin-top: 6px;
+  color: #fdf9d6;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+}
+
+.credit-3d::after {
+  content: "";
+  position: absolute;
+  inset: -120% -20%;
+  background: linear-gradient(115deg, transparent 45%, rgba(255, 255, 255, 0.32) 50%, transparent 55%);
+  transform: translateX(-42%);
+  animation: sweep 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes creditGlow {
+  0%, 100% { box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.34); }
+  50% { box-shadow: 0 16px 34px rgba(0, 0, 0, 0.30), 0 0 20px rgba(255, 230, 109, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.34); }
+}
+
+@keyframes creditShine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-48%) rotate(16deg); opacity: 0; }
+  35% { opacity: 0.8; }
+  70% { opacity: 0.2; }
+  100% { transform: translateX(52%) rotate(16deg); opacity: 0; }
+}
+
+@media (min-width: 880px) {
+  .container {
+    grid-template-columns: 1.05fr 1fr;
+  }
+  .hero {
+    grid-column: 1 / span 2;
+  }
+}
+</style>
+</head>
+<body>
+<div class="bg-blobs" aria-hidden="true">
+  <span></span><span></span><span></span><span></span>
+</div>
+<canvas id="fx"></canvas>
+
+<div class="page">
+  <div class="container">
+    <section class="card hero">
+      <div class="hero-top">
+        <h1 id="title"></h1>
+        <span class="tag">Holi 2026 Edition</span>
+      </div>
+      <p>Create a Holi wish link, play music, and share on phone with stable links.</p>
+      <div class="controls-row" style="margin-top:12px;">
+        <input id="nameInput" type="text" placeholder="Enter friend name">
+        <button class="primary" onclick="generateLink()">Generate Share Link</button>
+        <button onclick="fireworks()">Fireworks</button>
+        <button onclick="downloadImage()">Download Wish</button>
+      </div>
+      <div id="shareStatus" class="meta-line" style="margin-top:10px;">Share link not generated yet.</div>
+      <div id="countdown" style="margin-top:8px;"></div>
+      <div id="thought"></div>
+    </section>
+
+    <section class="card">
+      <h2>Custom Music Player</h2>
+      <div class="music-head">
+        <button id="musicBtn" class="play-btn" onclick="toggleMusic()" aria-label="Play or pause">
+          <span id="musicIcon">▶</span>
+        </button>
+        <div style="min-width:0; flex:1;">
+          <div id="musicTrack" class="track-name">Holi Local Mix</div>
+          <div id="musicStatus">Ready</div>
+        </div>
+      </div>
+      <div class="timeline-wrap">
+        <div class="timeline-head">
+          <span><strong>Full Song Timeline</strong></span>
+          <span id="timeLabel">00:00 / 00:00</span>
+        </div>
+        <input id="seekBar" class="seek-modern" type="range" min="0" max="100" value="0" aria-label="Seek">
+      </div>
+      <div class="music-actions">
+        <label for="musicFile" class="file-btn">Choose Song</label>
+        <input id="musicFile" type="file" accept="audio/*">
+        <span>Tip: upload your own song for full-length playback.</span>
+      </div>
+      <div class="sim-wrap">
+        <div class="sim-head">
+          <span id="simLabel">Simulation: idle</span>
+          <span id="simDot" class="sim-dot"></span>
+        </div>
+        <div id="simBars" class="sim-bars"></div>
+      </div>
+      <div id="songLabelPanel" class="song-label-panel" role="status" aria-live="polite">
+        <div class="song-label-top">
+          <span class="song-label-title">Song Label</span>
+          <span id="songModeChip" class="song-chip">Local Mix</span>
+        </div>
+        <div id="songLabelText" class="song-label-text">Holi Local Mix</div>
+        <div id="songLabelHint" class="song-label-hint">Ready to play</div>
+      </div>
+      <audio id="audioNative" loop preload="auto" playsinline></audio>
+    </section>
+
+    <section class="card">
+      <h2>Music Search</h2>
+      <div class="spotify-row">
+        <input id="spotifyInput" type="text" placeholder="Type song name or paste Spotify track link">
+        <button id="spotifySearchBtn" class="primary" onclick="loadSpotify()">Search and Play</button>
+        <button id="spotifyCheckBtn" onclick="checkSpotifyBackendHealth()">Check Music Setup</button>
+      </div>
+      <div id="spotifyStatus" style="margin-top:8px;">Music search not loaded.</div>
+      <div id="backendPill" class="backend-pill warn">Checking backend...</div>
+      <div id="spotifyFrameHost"></div>
+      <iframe id="spotifyFallbackFrame" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      <div id="spotifyControls" class="spotify-controls">
+        <button id="ctlPlay" onclick="spotifyPlay()">Play</button>
+        <button id="ctlPause" onclick="spotifyPause()">Pause</button>
+        <button id="ctlToggle" onclick="spotifyToggle()">Toggle</button>
+        <button id="ctlNext" onclick="spotifyNext()">Next</button>
+      </div>
+      <div class="timeline-wrap">
+        <div class="timeline-head">
+          <span><strong>Search Preview Timeline</strong></span>
+          <span id="searchTimeLabel">00:00 / 00:00</span>
+        </div>
+        <input id="searchSeekBar" class="seek-modern" type="range" min="0" max="100" value="0" aria-label="Search track seek" disabled>
+      </div>
+      <div id="spotifyResults" class="spotify-results"></div>
+      <div class="meta-line" style="margin-top:10px;">Search mode is preview-based by provider policy. For full songs, use Full Song Timeline via stream or upload.</div>
+    </section>
+
+    <section class="card footer-notes">
+      <div id="deployNote" class="meta-line"></div>
+      <div class="meta-line">Tip: host this page on GitHub Pages or Netlify to make phone links work everywhere.</div>
+      <div id="credit3d" class="credit-3d" role="note">
+        <span class="credit-name">Made by Gopi Choudhary</span>
+        <small class="credit-tag">Colorverse Signature Edition 2026</small>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+// ---------- Constants ----------
+const DEPLOY_BASE_URL = ""; // Example: https://yourname.github.io/holi/
+const BACKEND_BASE_URL = ""; // Example: http://localhost:3000 (leave blank for auto-detect)
+
+const HOLI_DATES = {
+  2026: "2026-03-03T00:00:00",
+  2027: "2027-03-23T00:00:00",
+  2028: "2028-03-11T00:00:00",
+  2029: "2029-03-01T00:00:00",
+  2030: "2030-03-20T00:00:00"
+};
+
+const THOUGHTS = [
+  "True friends add color to your life.",
+  "Celebrate happiness like Holi colors.",
+  "Spread joy, color, and kindness.",
+  "Life is brighter with friendship."
+];
+
+const FALLBACK_AUDIO = [
+  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "https://cdn.pixabay.com/audio/2022/03/15/audio_9fbd1c68f2.mp3",
+  "./bollywood-holi.mp3"
+];
+
+// ---------- Title and URL params ----------
+const params = new URLSearchParams(window.location.search);
+const titleEl = document.getElementById("title");
+const nameInput = document.getElementById("nameInput");
+const spotifyInput = document.getElementById("spotifyInput");
+
+function normalizeBase(urlLike) {
+  if (!urlLike) return "";
+  return urlLike.replace(/\/+$/, "");
+}
+
+function getApiBaseUrl() {
+  const fromQuery = normalizeBase(params.get("backend") || "");
+  const fromConstant = normalizeBase(BACKEND_BASE_URL);
+  if (fromQuery) return fromQuery;
+  if (fromConstant) return fromConstant;
+  if (window.location.protocol === "file:") return "http://localhost:3000";
+  return window.location.origin;
+}
+
+const API_BASE_URL = getApiBaseUrl();
+let activeApiBase = API_BASE_URL;
+
+function apiCandidates() {
+  const list = [
+    normalizeBase(params.get("backend") || ""),
+    normalizeBase(BACKEND_BASE_URL),
+    normalizeBase(window.location.origin),
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+  ].filter(Boolean);
+  return Array.from(new Set(list));
+}
+
+function typeTitle(text) {
+  titleEl.textContent = "";
+  let i = 0;
+  const t = setInterval(() => {
+    titleEl.textContent += text.charAt(i);
+    i += 1;
+    if (i >= text.length) clearInterval(t);
+  }, 55);
+}
+
+const nameFromUrl = params.get("name") || "";
+if (nameFromUrl) {
+  nameInput.value = nameFromUrl;
+  titleEl.textContent = "Happy Holi, " + nameFromUrl + "!";
+} else {
+  typeTitle("Happy Holi!");
+}
+
+if (params.get("spotify")) spotifyInput.value = params.get("spotify");
+if (params.get("song")) spotifyInput.value = params.get("song");
+spotifyInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") loadSpotify();
+});
+
+// ---------- Share link ----------
+const shareStatus = document.getElementById("shareStatus");
+const deployNote = document.getElementById("deployNote");
+
+if (window.location.protocol === "file:") {
+  deployNote.textContent = "Running as local file. API base: " + API_BASE_URL + " (start backend with: npm start).";
+} else {
+  deployNote.textContent = "Running from server: " + window.location.origin + " | API base: " + API_BASE_URL;
+}
+
+function sanitizeShareBase() {
+  if (window.location.protocol === "file:") {
+    if (!DEPLOY_BASE_URL) return "";
+    return DEPLOY_BASE_URL;
+  }
+  return window.location.href;
+}
+
+function generateLink() {
+  const base = sanitizeShareBase();
+  if (!base) {
+    shareStatus.textContent = "Set DEPLOY_BASE_URL after deploying to generate phone-safe links.";
+    alert("Deploy first, then set DEPLOY_BASE_URL in this file.");
+    return;
+  }
+
+  const url = new URL(base);
+  url.searchParams.delete("name");
+  url.searchParams.delete("spotify");
+  url.searchParams.delete("song");
+
+  const n = nameInput.value.trim();
+  const s = spotifyInput.value.trim();
+
+  if (n) url.searchParams.set("name", n);
+  if (s) {
+    if (toSpotifyUri(s)) url.searchParams.set("spotify", s);
+    else url.searchParams.set("song", s);
+  }
+
+  const link = url.origin + url.pathname + (url.search ? url.search : "");
+
+  if (navigator.share) {
+    navigator.share({ title: "Holi Wish", text: "Open my Holi wish", url: link }).catch(() => {});
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(link).then(() => {
+      shareStatus.textContent = "Link copied: " + link;
+    }).catch(() => {
+      window.prompt("Copy this link", link);
+      shareStatus.textContent = "Copy manually from prompt.";
+    });
+  } else {
+    window.prompt("Copy this link", link);
+    shareStatus.textContent = "Copy manually from prompt.";
+  }
+}
+
+// ---------- Countdown ----------
+function nextHoliTs() {
+  const now = new Date();
+  let year = now.getFullYear();
+  while (!HOLI_DATES[year] || new Date(HOLI_DATES[year]) <= now) year += 1;
+  return new Date(HOLI_DATES[year]).getTime();
+}
+
+const holiTime = nextHoliTs();
+const countdownEl = document.getElementById("countdown");
+
+function tickCountdown() {
+  const gap = holiTime - Date.now();
+  if (gap <= 0) {
+    countdownEl.textContent = "Its Holi today!";
+    return;
+  }
+  const d = Math.floor(gap / (1000 * 60 * 60 * 24));
+  const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+  const s = Math.floor((gap % (1000 * 60)) / 1000);
+  countdownEl.textContent = "Next Holi in " + d + "d " + h + "h " + m + "m " + s + "s";
+}
+setInterval(tickCountdown, 1000);
+tickCountdown();
+
+// ---------- Rotating thought ----------
+const thoughtEl = document.getElementById("thought");
+let thoughtIndex = 0;
+setInterval(() => {
+  thoughtEl.textContent = "\"" + THOUGHTS[thoughtIndex] + "\"";
+  thoughtIndex = (thoughtIndex + 1) % THOUGHTS.length;
+}, 3500);
+
+// ---------- Music player ----------
+const audio = document.getElementById("audioNative");
+const musicBtn = document.getElementById("musicBtn");
+const musicIcon = document.getElementById("musicIcon");
+const musicTrack = document.getElementById("musicTrack");
+const musicStatus = document.getElementById("musicStatus");
+const seekBar = document.getElementById("seekBar");
+const timeLabel = document.getElementById("timeLabel");
+const musicFile = document.getElementById("musicFile");
+const simBars = document.getElementById("simBars");
+const simLabel = document.getElementById("simLabel");
+const simDot = document.getElementById("simDot");
+const searchSeekBar = document.getElementById("searchSeekBar");
+const searchTimeLabel = document.getElementById("searchTimeLabel");
+const songModeChip = document.getElementById("songModeChip");
+const songLabelText = document.getElementById("songLabelText");
+const songLabelHint = document.getElementById("songLabelHint");
+
+let fallbackIdx = 0;
+let simulationPlaying = false;
+
+function setSongLabel(text, hint, mode) {
+  if (songLabelText) songLabelText.textContent = text || "Unknown track";
+  if (songLabelHint) songLabelHint.textContent = hint || "";
+  if (songModeChip) songModeChip.textContent = mode || "Music";
+}
+
+for (let i = 0; i < 22; i++) {
+  const bar = document.createElement("div");
+  bar.className = "sim-bar";
+  simBars.appendChild(bar);
+}
+
+function updateSimulation(source, playing) {
+  simulationPlaying = playing;
+  simLabel.textContent = "Simulation: " + (playing ? ("playing (" + source + ")") : "idle");
+  simDot.classList.toggle("live", playing);
+}
+
+function runSimulation() {
+  const bars = simBars.children;
+  for (let i = 0; i < bars.length; i++) {
+    const base = simulationPlaying ? 22 : 8;
+    const swing = simulationPlaying ? (Math.random() * 74) : (Math.random() * 6);
+    bars[i].style.height = (base + swing) + "%";
+  }
+}
+setInterval(runSimulation, 120);
+runSimulation();
+
+function fmt(sec) {
+  if (!isFinite(sec)) return "00:00";
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(Math.floor(sec % 60)).padStart(2, "0");
+  return m + ":" + s;
+}
+
+function setMusicUI(playing) {
+  musicIcon.textContent = playing ? "||" : "▶";
+  musicBtn.classList.toggle("is-playing", playing);
+  updateSimulation("Local", playing);
+}
+
+function setFallbackSource(i) {
+  fallbackIdx = i;
+  audio.src = FALLBACK_AUDIO[i];
+  audio.load();
+  if (i === 0) musicTrack.textContent = "Festival Stream Track";
+  else if (i === 1) musicTrack.textContent = "Backup Festival Track";
+  else musicTrack.textContent = "Local Holi Mix";
+  musicStatus.textContent = "Track loaded";
+  setSongLabel(musicTrack.textContent, "Loaded and ready", i === 0 ? "Stream" : (i === 1 ? "Backup" : "Local Mix"));
+  seekBar.value = 0;
+  timeLabel.textContent = "00:00 / 00:00";
+}
+
+setFallbackSource(0);
+
+async function toggleMusic() {
+  try {
+    if (audio.paused) {
+      await audio.play();
+      setMusicUI(true);
+      musicStatus.textContent = "Playing";
+      setSongLabel(musicTrack.textContent, "Now playing", "Local Player");
+    } else {
+      audio.pause();
+      setMusicUI(false);
+      musicStatus.textContent = "Paused";
+      setSongLabel(musicTrack.textContent, "Paused", "Local Player");
+    }
+  } catch (e) {
+    musicStatus.textContent = "Playback blocked. Tap once and retry.";
+    setSongLabel(musicTrack.textContent, "Playback blocked by browser", "Local Player");
+  }
+}
+
+musicFile.addEventListener("change", (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const u = URL.createObjectURL(f);
+  audio.src = u;
+  audio.load();
+  musicTrack.textContent = f.name;
+  musicStatus.textContent = "Local file loaded";
+  setSongLabel(f.name, "Custom upload selected", "Upload");
+});
+
+audio.addEventListener("error", () => {
+  if (fallbackIdx < FALLBACK_AUDIO.length - 1) {
+    setFallbackSource(fallbackIdx + 1);
+    musicStatus.textContent = "Primary track failed, backup loaded";
+    setSongLabel(musicTrack.textContent, "Switched to backup track", "Backup");
+  } else {
+    musicStatus.textContent = "Audio failed. Choose a local file.";
+    setSongLabel(musicTrack.textContent, "Audio failed, choose a file", "Error");
+  }
+});
+
+audio.addEventListener("play", () => setMusicUI(true));
+audio.addEventListener("pause", () => setMusicUI(false));
+audio.addEventListener("loadedmetadata", () => {
+  timeLabel.textContent = "00:00 / " + fmt(audio.duration);
+});
+audio.addEventListener("timeupdate", () => {
+  if (isFinite(audio.duration) && audio.duration > 0) {
+    seekBar.value = (audio.currentTime / audio.duration) * 100;
+  }
+  timeLabel.textContent = fmt(audio.currentTime) + " / " + fmt(audio.duration);
+});
+seekBar.addEventListener("input", () => {
+  if (isFinite(audio.duration) && audio.duration > 0) {
+    audio.currentTime = (Number(seekBar.value) / 100) * audio.duration;
+  }
+});
+
+// ---------- Spotify ----------
+const spotifyStatus = document.getElementById("spotifyStatus");
+const spotifyFrameHost = document.getElementById("spotifyFrameHost");
+const spotifyFallbackFrame = document.getElementById("spotifyFallbackFrame");
+const spotifyControls = document.getElementById("spotifyControls");
+const spotifyResults = document.getElementById("spotifyResults");
+const backendPill = document.getElementById("backendPill");
+const spotifySearchBtn = document.getElementById("spotifySearchBtn");
+const spotifyCheckBtn = document.getElementById("spotifyCheckBtn");
+const ctlPlay = document.getElementById("ctlPlay");
+const ctlPause = document.getElementById("ctlPause");
+const ctlToggle = document.getElementById("ctlToggle");
+const ctlNext = document.getElementById("ctlNext");
+
+let spotifyController = null;
+let spotifyApiLoading = false;
+let spotifyApiReady = false;
+let spotifyPendingUri = "";
+let spotifyIsPlaying = false;
+let spotifyBackendReady = false;
+let spotifyFallbackOnly = false;
+let spotifyQueue = [];
+let spotifyQueueIndex = -1;
+let lastAutoAdvanceAt = 0;
+let spotifyEmbedDurationSec = 0;
+const previewAudio = new Audio();
+previewAudio.preload = "none";
+previewAudio.crossOrigin = "anonymous";
+
+function setFallbackOnlyMode(reason) {
+  spotifyFallbackOnly = true;
+  spotifyBackendReady = false;
+  spotifyResults.innerHTML = "";
+  spotifyResults.style.display = "grid";
+  setBackendPill("warn", "Fallback-only mode");
+  spotifyStatus.textContent = reason || "API unavailable. Using in-app fallback search mode.";
+  spotifySearchBtn.textContent = "Search and Play";
+  spotifyCheckBtn.style.display = "inline-block";
+  syncMusicControls();
+}
+
+function setApiMode() {
+  spotifyFallbackOnly = false;
+  spotifyResults.style.display = "grid";
+  spotifySearchBtn.textContent = "Search and Play";
+  spotifyCheckBtn.style.display = "inline-block";
+  syncMusicControls();
+}
+
+function toSpotifyUri(input) {
+  if (!input) return "";
+  if (input.startsWith("spotify:")) return input;
+  const m = input.match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(?:embed\/)?(track|playlist|album)\/([A-Za-z0-9]+)/i);
+  if (!m) return "";
+  return "spotify:" + m[1].toLowerCase() + ":" + m[2];
+}
+
+function spotifyUriToEmbedUrl(uri) {
+  const match = uri.match(/^spotify:(track|playlist|album):([A-Za-z0-9]+)$/);
+  if (!match) return "";
+  return "https://open.spotify.com/embed/" + match[1] + "/" + match[2] + "?utm_source=generator";
+}
+
+function showSpotifyFallback(uri) {
+  const embed = spotifyUriToEmbedUrl(uri);
+  if (!embed) return;
+  stopPreviewPlayback();
+  spotifyQueue = [];
+  spotifyQueueIndex = -1;
+  spotifyResults.style.display = "none";
+  spotifyResults.innerHTML = "";
+  spotifyFrameHost.style.display = "none";
+  spotifyControls.style.display = "none";
+  spotifyFallbackFrame.style.height = "152px";
+  spotifyFallbackFrame.src = embed;
+  spotifyFallbackFrame.style.display = "block";
+  resetSearchTimelineLabel();
+  setSongLabel("Spotify Embed", "Fallback player loaded", "Spotify");
+  spotifyStatus.textContent = "Loaded fallback Spotify player.";
+  updateSimulation("Spotify", false);
+  syncMusicControls();
+}
+
+async function showSpotifySearchFallback(query) {
+  if (spotifyController) {
+    spotifyController.pause();
+  }
+  spotifyFrameHost.style.display = "none";
+  spotifyControls.style.display = "none";
+  spotifyFallbackFrame.style.display = "none";
+  spotifyFallbackFrame.src = "";
+  resetSearchTimelineLabel();
+  spotifyResults.style.display = "grid";
+  spotifyResults.innerHTML = "";
+
+  try {
+    const endpoint = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=12`;
+    const res = await fetch(endpoint);
+    if (!res.ok) throw new Error("fallback_search_failed");
+    const data = await res.json();
+    const items = (data.results || []).map((track) => ({
+      id: `it:${String(track.trackId || "")}`,
+      name: track.trackName || "Unknown title",
+      artist: track.artistName || "Unknown artist",
+      preview: track.previewUrl || "",
+      url: track.trackViewUrl || "",
+      image: track.artworkUrl60 || track.artworkUrl100 || "",
+      duration: Number((track.trackTimeMillis || 30000) / 1000)
+    }));
+    if (!items.length) {
+      spotifyStatus.textContent = "No songs found in fallback search.";
+      return;
+    }
+    const ranked = rankSpotifyItems(items, query);
+    renderSpotifyResults(ranked);
+    setQueue(ranked, 0);
+    playQueueItem(ranked[0]);
+    spotifyStatus.textContent = "Playing in-app fallback result: " + ranked[0].name + " - " + ranked[0].artist;
+  } catch (_) {
+    spotifyStatus.textContent = "Fallback search also failed. Please check internet and retry.";
+  }
+  updateSimulation("Music", false);
+  syncMusicControls();
+}
+
+function setBackendPill(status, text) {
+  backendPill.classList.remove("warn", "error");
+  if (status === "warn") backendPill.classList.add("warn");
+  if (status === "error") backendPill.classList.add("error");
+  backendPill.textContent = text;
+}
+
+function hasPreviewQueueItem() {
+  return spotifyQueueIndex >= 0 && !!(spotifyQueue[spotifyQueueIndex] && spotifyQueue[spotifyQueueIndex].preview);
+}
+
+function stopPreviewPlayback() {
+  previewAudio.pause();
+  previewAudio.removeAttribute("src");
+  previewAudio.load();
+  searchSeekBar.value = 0;
+}
+
+function resetSearchTimelineLabel() {
+  searchSeekBar.value = 0;
+  searchSeekBar.disabled = true;
+  searchTimeLabel.textContent = "--:-- / --:--";
+  spotifyEmbedDurationSec = 0;
+}
+
+function updateSearchTimelineFromSpotify(positionMs, durationMs) {
+  const posSec = Number(positionMs || 0) / 1000;
+  const durSec = Number(durationMs || 0) / 1000;
+  if (durSec > 0 && Number.isFinite(durSec)) {
+    spotifyEmbedDurationSec = durSec;
+    searchSeekBar.disabled = false;
+    searchSeekBar.value = Math.max(0, Math.min(100, (posSec / durSec) * 100));
+    searchTimeLabel.textContent = fmt(posSec) + " / " + fmt(durSec);
+    return;
+  }
+  resetSearchTimelineLabel();
+}
+
+function clearSpotifyLinkModeUi() {
+  spotifyPendingUri = "";
+  spotifyFrameHost.style.display = "none";
+  spotifyFallbackFrame.style.display = "none";
+  spotifyFallbackFrame.src = "";
+}
+
+function syncMusicControls() {
+  const hasPreview = hasPreviewQueueItem();
+  const hasEmbed = !!spotifyController;
+  const show = hasPreview || hasEmbed;
+  spotifyControls.style.display = show ? "flex" : "none";
+  const enableMain = hasPreview || hasEmbed;
+  if (ctlPlay) ctlPlay.disabled = !enableMain;
+  if (ctlPause) ctlPause.disabled = !enableMain;
+  if (ctlToggle) ctlToggle.disabled = !enableMain;
+  if (ctlNext) ctlNext.disabled = !hasPreview;
+  if (!hasPreview && !hasEmbed) {
+    searchSeekBar.disabled = true;
+  }
+}
+
+function ensureSpotifyApi() {
+  if (spotifyApiReady || spotifyApiLoading) return;
+  spotifyApiLoading = true;
+
+  window.onSpotifyIframeApiReady = (IFrameAPI) => {
+    spotifyApiReady = true;
+    spotifyApiLoading = false;
+    IFrameAPI.createController(
+      spotifyFrameHost,
+      { uri: "spotify:track:11dFghVXANMlKmJXsNCbNl" },
+      (controller) => {
+        spotifyController = controller;
+        controller.addListener("playback_update", (evt) => {
+          spotifyIsPlaying = !!(evt && evt.data && !evt.data.isPaused);
+          spotifyStatus.textContent = spotifyIsPlaying ? "Now playing on Spotify" : "Paused on Spotify";
+          updateSimulation("Spotify", spotifyIsPlaying);
+
+          const d = evt && evt.data ? evt.data : null;
+          if (!d) return;
+          updateSearchTimelineFromSpotify(d.position, d.duration);
+          if (d.trackName) {
+            const artistText = Array.isArray(d.trackArtists) ? d.trackArtists.join(", ") : "Spotify";
+            setSongLabel(d.trackName, artistText + " | Spotify embed playback", "Spotify");
+          }
+          const now = Date.now();
+          const nearEnd = Number.isFinite(d.duration) && Number.isFinite(d.position) && d.duration > 0 && d.position >= (d.duration - 1500);
+          if (nearEnd && d.isPaused && (now - lastAutoAdvanceAt) > 2500) {
+            lastAutoAdvanceAt = now;
+            advanceQueue();
+          }
+        });
+
+        spotifyFrameHost.style.display = "block";
+        spotifyFallbackFrame.style.display = "none";
+        spotifyFallbackFrame.src = "";
+        syncMusicControls();
+
+        if (spotifyPendingUri) {
+          controller.loadUri(spotifyPendingUri);
+          controller.play();
+          spotifyPendingUri = "";
+        }
+      }
+    );
+  };
+
+  const s = document.createElement("script");
+  s.src = "https://open.spotify.com/embed/iframe-api/v1";
+  s.onerror = () => {
+    spotifyApiLoading = false;
+    spotifyStatus.textContent = "Spotify player SDK failed to load.";
+  };
+  document.body.appendChild(s);
+}
+
+function loadSpotifyUri(uri) {
+  stopPreviewPlayback();
+  spotifyQueue = [];
+  spotifyQueueIndex = -1;
+  spotifyResults.style.display = "none";
+  spotifyResults.innerHTML = "";
+  resetSearchTimelineLabel();
+  setSongLabel("Spotify Track", "Loading from pasted Spotify URL", "Spotify");
+  ensureSpotifyApi();
+  if (spotifyController) {
+    spotifyController.loadUri(uri);
+    spotifyController.play();
+    spotifyFrameHost.style.display = "block";
+    spotifyFallbackFrame.style.display = "none";
+    spotifyFallbackFrame.src = "";
+    spotifyStatus.textContent = "Now playing on Spotify";
+    updateSimulation("Spotify", true);
+    syncMusicControls();
+  } else {
+    spotifyPendingUri = uri;
+    spotifyStatus.textContent = "Loading Spotify player...";
+    setTimeout(() => {
+      if (!spotifyController && spotifyPendingUri === uri) {
+        showSpotifyFallback(uri);
+      }
+    }, 2500);
+  }
+}
+
+function playQueueItem(item) {
+  if (!item || !item.preview) {
+    spotifyStatus.textContent = "Preview not available for this song. Choose another result.";
+    setSongLabel("No preview available", "Choose another result", "Search");
+    searchSeekBar.disabled = true;
+    searchSeekBar.value = 0;
+    searchTimeLabel.textContent = "--:-- / --:--";
+    return;
+  }
+  if (spotifyController) {
+    spotifyController.pause();
+  }
+  previewAudio.src = item.preview;
+  previewAudio.play().catch(() => {
+    spotifyStatus.textContent = "Tap Play once to enable audio preview.";
+  });
+  searchSeekBar.disabled = false;
+  spotifyStatus.textContent = "Now playing preview: " + (item.name || "Track") + (item.artist ? (" - " + item.artist) : "") + " (preview)";
+  setSongLabel(item.name || "Track", (item.artist || "Preview playback") + " | Preview mode", "Search Queue");
+  updateSimulation("Music", true);
+  syncMusicControls();
+}
+
+function setQueue(items, startIndex) {
+  spotifyQueue = Array.isArray(items) ? items.slice() : [];
+  if (!spotifyQueue.length) {
+    spotifyQueueIndex = -1;
+    return;
+  }
+  spotifyQueueIndex = Math.max(0, Math.min(startIndex || 0, spotifyQueue.length - 1));
+  syncMusicControls();
+}
+
+function queueHasNext() {
+  return spotifyQueueIndex >= 0 && spotifyQueueIndex < spotifyQueue.length - 1;
+}
+
+async function maybeAppendRecommendations() {
+  if (spotifyFallbackOnly || !spotifyBackendReady) return;
+  if (spotifyQueueIndex < 0 || spotifyQueueIndex >= spotifyQueue.length) return;
+  if (spotifyQueue.length - spotifyQueueIndex > 3) return;
+
+  const current = spotifyQueue[spotifyQueueIndex];
+  if (!current || !current.id) return;
+
+  try {
+    const endpoint = new URL("/api/music/recommendations", activeApiBase);
+    endpoint.searchParams.set("trackId", current.id);
+    endpoint.searchParams.set("artist", current.artist || "");
+    endpoint.searchParams.set("q", current.name || "");
+    endpoint.searchParams.set("limit", "8");
+    const res = await fetch(endpoint.toString());
+    if (!res.ok) return;
+    const data = await res.json();
+    const seen = new Set(spotifyQueue.map((x) => x.id));
+    const extra = (data.items || []).filter((x) => x && x.id && !seen.has(x.id));
+    if (extra.length) {
+      spotifyQueue.push(...extra);
+      renderSpotifyResults(spotifyQueue);
+    }
+  } catch (_) {}
+}
+
+async function advanceQueue() {
+  if (!queueHasNext()) {
+    await maybeAppendRecommendations();
+  }
+  if (!queueHasNext()) return;
+  spotifyQueueIndex += 1;
+  const next = spotifyQueue[spotifyQueueIndex];
+  playQueueItem(next);
+  maybeAppendRecommendations();
+}
+
+function renderSpotifyResults(items) {
+  spotifyResults.innerHTML = "";
+  if (!items.length) return;
+  items.forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "spotify-result";
+    const left = document.createElement("div");
+    left.className = "spotify-meta";
+    if (item.image) {
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.alt = item.name;
+      left.appendChild(img);
+    }
+    const textWrap = document.createElement("div");
+    const t = document.createElement("div");
+    t.className = "spotify-title";
+    t.textContent = item.name;
+    const s = document.createElement("div");
+    s.className = "spotify-sub";
+    s.textContent = item.artist;
+    textWrap.appendChild(t);
+    textWrap.appendChild(s);
+    left.appendChild(textWrap);
+    const playBtn = document.createElement("button");
+    playBtn.textContent = item.preview ? "Play" : "No Preview";
+    playBtn.disabled = !item.preview;
+    playBtn.onclick = () => {
+      setQueue(items, idx);
+      playQueueItem(item);
+      maybeAppendRecommendations();
+    };
+    row.appendChild(left);
+    row.appendChild(playBtn);
+    spotifyResults.appendChild(row);
+  });
+  syncMusicControls();
+}
+
+function rankSpotifyItems(items, query) {
+  const q = query.toLowerCase().trim();
+  const tokens = q.split(/\s+/).filter(Boolean);
+  return items
+    .map((item) => {
+      const name = (item.name || "").toLowerCase();
+      const artist = (item.artist || "").toLowerCase();
+      let score = 0;
+      if (name === q) score += 120;
+      if (name.startsWith(q)) score += 70;
+      if (name.includes(q)) score += 50;
+      if (artist.includes(q)) score += 20;
+      for (const token of tokens) {
+        if (name.includes(token)) score += 8;
+        if (artist.includes(token)) score += 4;
+      }
+      return { item, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.item);
+}
+
+async function checkSpotifyBackendHealth() {
+  const bases = apiCandidates();
+  for (const base of bases) {
+    try {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 8000);
+      const endpoint = new URL("/api/music/search", base);
+      endpoint.searchParams.set("q", "test");
+      endpoint.searchParams.set("limit", "1");
+      const res = await fetch(endpoint.toString(), { signal: ctl.signal });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const data = await res.json();
+      activeApiBase = base;
+      spotifyBackendReady = true;
+      spotifyFallbackOnly = false;
+      setApiMode();
+      setBackendPill("ok", "Connected");
+      spotifyStatus.textContent = "Music backend ready at " + activeApiBase;
+      return;
+    } catch (_) {}
+  }
+
+  spotifyBackendReady = false;
+  setFallbackOnlyMode("Backend unavailable. Using in-app fallback search.");
+}
+
+async function loadSpotify() {
+  const raw = spotifyInput.value.trim();
+  spotifyResults.innerHTML = "";
+  if (!raw) {
+    spotifyStatus.textContent = "Type a song name first.";
+    return;
+  }
+
+  const spotifyUri = toSpotifyUri(raw);
+  if (spotifyUri) {
+    spotifyQueue = [];
+    spotifyQueueIndex = -1;
+    spotifyResults.style.display = "none";
+    loadSpotifyUri(spotifyUri);
+    spotifyStatus.textContent = "Loading pasted Spotify link...";
+    return;
+  }
+
+  clearSpotifyLinkModeUi();
+  spotifyResults.style.display = "grid";
+  spotifyStatus.textContent = "Searching songs...";
+  if (spotifyController) {
+    spotifyController.pause();
+  }
+  spotifyControls.style.display = "none";
+  spotifyFallbackFrame.style.height = "152px";
+  try {
+    if (spotifyFallbackOnly) {
+      await showSpotifySearchFallback(raw);
+      return;
+    }
+
+    if (!spotifyBackendReady) {
+      await checkSpotifyBackendHealth();
+      if (spotifyFallbackOnly) {
+        await showSpotifySearchFallback(raw);
+        return;
+      }
+      if (!spotifyBackendReady) {
+        await showSpotifySearchFallback(raw);
+        return;
+      }
+    }
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 10000);
+    const endpoint = new URL("/api/music/search", activeApiBase);
+    endpoint.searchParams.set("q", raw);
+    endpoint.searchParams.set("limit", "12");
+    const res = await fetch(endpoint.toString(), { signal: ctl.signal });
+    clearTimeout(timer);
+    if (!res.ok) {
+      let msg = "search_failed";
+      try {
+        const errData = await res.json();
+        msg = errData.message || msg;
+      } catch (_) {
+        try {
+          const txt = await res.text();
+          if (txt && txt.trim()) msg = txt.slice(0, 120);
+        } catch (_) {}
+      }
+      msg = "HTTP " + res.status + " - " + msg;
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    if (!data.items || !data.items.length) {
+      await showSpotifySearchFallback(raw);
+      return;
+    }
+    const ranked = rankSpotifyItems(data.items, raw);
+    const first = ranked[0];
+    renderSpotifyResults(ranked);
+    setQueue(ranked, 0);
+    playQueueItem(first);
+    maybeAppendRecommendations();
+  } catch (e) {
+    const msg = (e.message || "unknown_error").replace(/\s+/g, " ").slice(0, 180);
+    spotifyStatus.textContent = "Music search failed: " + msg + ". Trying in-app fallback.";
+    await showSpotifySearchFallback(raw);
+  }
+}
+
+function spotifyPlay() {
+  if (spotifyController && !hasPreviewQueueItem()) {
+    spotifyController.play();
+    spotifyStatus.textContent = "Now playing on Spotify";
+    updateSimulation("Spotify", true);
+    syncMusicControls();
+    return;
+  }
+  if (!hasPreviewQueueItem()) {
+    spotifyStatus.textContent = "Search and select a song first.";
+    return;
+  }
+  previewAudio.play().then(() => {
+    spotifyStatus.textContent = "Playing preview";
+    setSongLabel(songLabelText.textContent, "Playing preview", "Search Queue");
+    updateSimulation("Music", true);
+    syncMusicControls();
+  }).catch(() => {
+    spotifyStatus.textContent = "Tap play again to allow audio.";
+  });
+}
+
+function spotifyPause() {
+  if (spotifyController && !hasPreviewQueueItem()) {
+    spotifyController.pause();
+    spotifyStatus.textContent = "Paused on Spotify";
+    updateSimulation("Spotify", false);
+    syncMusicControls();
+    return;
+  }
+  if (previewAudio.paused) {
+    spotifyStatus.textContent = "Already paused.";
+    return;
+  }
+  previewAudio.pause();
+  spotifyStatus.textContent = "Paused preview";
+  setSongLabel(songLabelText.textContent, "Paused preview", "Search Queue");
+  updateSimulation("Music", false);
+  syncMusicControls();
+}
+
+function spotifyToggle() {
+  if (spotifyController && !hasPreviewQueueItem()) {
+    if (spotifyIsPlaying) {
+      spotifyController.pause();
+      updateSimulation("Spotify", false);
+    } else {
+      spotifyController.play();
+      updateSimulation("Spotify", true);
+    }
+    syncMusicControls();
+    return;
+  }
+  if (!hasPreviewQueueItem()) {
+    spotifyStatus.textContent = "Search and select a song first.";
+    return;
+  }
+  if (!previewAudio.paused) {
+    previewAudio.pause();
+    updateSimulation("Music", false);
+  } else {
+    previewAudio.play().catch(() => {});
+    updateSimulation("Music", true);
+  }
+  syncMusicControls();
+}
+
+function spotifyNext() {
+  if (!hasPreviewQueueItem()) {
+    spotifyStatus.textContent = "Next is available for search queue only.";
+    return;
+  }
+  advanceQueue();
+  syncMusicControls();
+}
+
+previewAudio.addEventListener("ended", () => {
+  advanceQueue();
+  syncMusicControls();
+});
+
+previewAudio.addEventListener("loadedmetadata", () => {
+  searchTimeLabel.textContent = "00:00 / " + fmt(previewAudio.duration);
+});
+
+previewAudio.addEventListener("timeupdate", () => {
+  if (isFinite(previewAudio.duration) && previewAudio.duration > 0) {
+    searchSeekBar.value = (previewAudio.currentTime / previewAudio.duration) * 100;
+  }
+  searchTimeLabel.textContent = fmt(previewAudio.currentTime) + " / " + fmt(previewAudio.duration);
+});
+
+searchSeekBar.addEventListener("input", () => {
+  if (searchSeekBar.disabled) return;
+  if (hasPreviewQueueItem() && isFinite(previewAudio.duration) && previewAudio.duration > 0) {
+    previewAudio.currentTime = (Number(searchSeekBar.value) / 100) * previewAudio.duration;
+    return;
+  }
+  if (spotifyController && !hasPreviewQueueItem() && spotifyEmbedDurationSec > 0 && typeof spotifyController.seek === "function") {
+    const ms = Math.floor((Number(searchSeekBar.value) / 100) * spotifyEmbedDurationSec * 1000);
+    spotifyController.seek(ms);
+  }
+});
+
+previewAudio.addEventListener("play", () => {
+  updateSimulation("Music", true);
+  syncMusicControls();
+});
+
+previewAudio.addEventListener("pause", () => {
+  updateSimulation("Music", false);
+  syncMusicControls();
+});
+
+if (params.get("spotify")) {
+  loadSpotify();
+} else if (params.get("song")) {
+  spotifyStatus.textContent = "Song query loaded. Tap Search and Play.";
+  loadSpotify();
+}
+checkSpotifyBackendHealth();
+
+// ---------- Confetti particle effect ----------
+const canvas = document.getElementById("fx");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+function spawnParticles(x, y, count = 26) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x,
+      y,
+      size: Math.random() * 6 + 2,
+      color: "hsl(" + Math.floor(Math.random() * 360) + ", 95%, 60%)",
+      dx: (Math.random() - 0.5) * 5,
+      dy: (Math.random() - 0.5) * 5,
+      life: 1
+    });
+  }
+}
+
+document.addEventListener("click", (e) => spawnParticles(e.clientX, e.clientY, 24));
+document.addEventListener("touchstart", (e) => {
+  const t = e.touches && e.touches[0];
+  if (t) spawnParticles(t.clientX, t.clientY, 24);
+}, { passive: true });
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.dx;
+    p.y += p.dy;
+    p.size *= 0.96;
+    p.life *= 0.97;
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    if (p.size < 0.6 || p.life < 0.06) particles.splice(i, 1);
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+function fireworks() {
+  const bursts = 9;
+  for (let i = 0; i < bursts; i++) {
+    setTimeout(() => {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * (canvas.height * 0.58);
+      spawnParticles(x, y, 54);
+    }, i * 240);
+  }
+}
+
+// ---------- Download wish card ----------
+function downloadImage() {
+  if (!window.html2canvas) {
+    alert("Please wait a moment and try again.");
+    return;
+  }
+  window.html2canvas(document.body).then((c) => {
+    const a = document.createElement("a");
+    a.download = "happy-holi-wish.png";
+    a.href = c.toDataURL("image/png");
+    a.click();
+  });
+}
+
+const html2CanvasScript = document.createElement("script");
+html2CanvasScript.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+document.body.appendChild(html2CanvasScript);
+
+// 3D credit tilt effect
+const credit3d = document.getElementById("credit3d");
+if (credit3d) {
+  credit3d.addEventListener("mousemove", (e) => {
+    const r = credit3d.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    const rotY = (x - 0.5) * 18;
+    const rotX = (0.5 - y) * 14;
+    credit3d.style.transform = "perspective(900px) rotateX(" + rotX.toFixed(2) + "deg) rotateY(" + rotY.toFixed(2) + "deg) scale3d(1.02,1.02,1.02)";
+  });
+
+  credit3d.addEventListener("mouseleave", () => {
+    credit3d.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+  });
+}
+
+// Mobile autoplay gesture assist
+document.addEventListener("click", async () => {
+  if (audio.paused) {
+    try { await audio.play(); audio.pause(); } catch (_) {}
+  }
+}, { once: true });
+</script>
+</body>
+</html>
