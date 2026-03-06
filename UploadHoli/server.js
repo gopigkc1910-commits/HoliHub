@@ -48,6 +48,26 @@ const ALLOWED_THEMES = new Set([
   "cute-pastel",
   "minimal"
 ]);
+const ALLOWED_AUDIENCES = new Set([
+  "friend",
+  "crush",
+  "partner",
+  "sibling",
+  "family",
+  "colleague",
+  "classmate",
+  "community"
+]);
+const AUDIENCE_LABELS = {
+  friend: "best friend",
+  crush: "crush",
+  partner: "partner",
+  sibling: "sibling",
+  family: "family member",
+  colleague: "colleague",
+  classmate: "classmate",
+  community: "community"
+};
 const ALLOWED_REACTIONS = new Set(["love", "funny", "emotional", "romantic"]);
 const REACTION_LABELS = {
   love: "Loved it",
@@ -215,6 +235,7 @@ function loadWishesFromDisk() {
         category: safePick(wish.category, new Set(["Mood", "Festival"]), "Festival"),
         mood: safePick(wish.mood, ALLOWED_MOODS, "Celebration"),
         festival: safePick(wish.festival, ALLOWED_FESTIVALS, "Holi"),
+        audience: safePick(wish.audience, ALLOWED_AUDIENCES, "friend"),
         theme: safePick(wish.theme, ALLOWED_THEMES, "holi"),
         anonymous: !!wish.anonymous,
         anonymousAlias: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : "",
@@ -576,6 +597,7 @@ app.post("/api/wishes", (req, res) => {
   const category = safePick(body.category, new Set(["Mood", "Festival"]), "Festival");
   const mood = safePick(body.mood || "Celebration", ALLOWED_MOODS, "Celebration");
   const festival = safePick(body.festival || "Holi", ALLOWED_FESTIVALS, "Holi");
+  const audience = safePick(body.audience || "friend", ALLOWED_AUDIENCES, "friend");
   const anonymous = !!body.anonymous;
   const senderName = trimText(body.senderName || "", 80);
   const anonymousAlias = anonymous ? buildAnonymousAlias(body.anonymousAlias || "") : "";
@@ -595,6 +617,7 @@ app.post("/api/wishes", (req, res) => {
     category,
     mood,
     festival,
+    audience,
     senderName,
     senderDisplayName: anonymous ? anonymousAlias : senderName,
     anonymous,
@@ -620,10 +643,12 @@ app.get("/api/wishes/trending", (req, res) => {
   const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(30, limitRaw)) : 8;
   const mood = trimText(req.query.mood || "", 40);
   const festival = trimText(req.query.festival || "", 40);
+  const audience = trimText(req.query.audience || "", 40);
   const items = Array.from(wishesStore.values())
     .filter((wish) => {
       if (mood && wish.mood !== mood) return false;
       if (festival && wish.festival !== festival) return false;
+      if (audience && wish.audience !== audience) return false;
       return true;
     })
     .sort((a, b) => {
@@ -639,6 +664,7 @@ app.get("/api/wishes/trending", (req, res) => {
       category: wish.category,
       mood: wish.mood,
       festival: wish.festival,
+      audience: wish.audience || "friend",
       friendName: wish.friendName,
       theme: wish.theme,
       views: Number(wish.views || 0),
@@ -691,14 +717,16 @@ app.get("/api/wishes", (req, res) => {
   const festivalFilter = trimText(req.query.festival || "", 40);
   const moodFilter = trimText(req.query.mood || "", 40);
   const categoryFilter = trimText(req.query.category || "", 20);
+  const audienceFilter = trimText(req.query.audience || "", 40);
   const q = trimText(req.query.q || "", 80).toLowerCase();
   const items = Array.from(wishesStore.values())
     .filter((wish) => {
       if (festivalFilter && wish.festival !== festivalFilter) return false;
       if (moodFilter && wish.mood !== moodFilter) return false;
       if (categoryFilter && wish.category !== categoryFilter) return false;
+      if (audienceFilter && wish.audience !== audienceFilter) return false;
       if (!q) return true;
-      const text = `${wish.friendName || ""} ${wish.message || ""} ${wish.festival || ""} ${wish.mood || ""}`.toLowerCase();
+      const text = `${wish.friendName || ""} ${wish.message || ""} ${wish.festival || ""} ${wish.mood || ""} ${wish.audience || ""}`.toLowerCase();
       return text.includes(q);
     })
     .sort((a, b) => Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0))
@@ -708,6 +736,7 @@ app.get("/api/wishes", (req, res) => {
       category: wish.category || "Festival",
       mood: wish.mood || "Celebration",
       festival: wish.festival,
+      audience: wish.audience || "friend",
       senderName: wish.anonymous ? "" : (wish.senderName || ""),
       senderDisplayName: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : (wish.senderName || ""),
       anonymousAlias: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : "",
@@ -726,6 +755,7 @@ app.get("/api/wishes", (req, res) => {
     festival: festivalFilter || "",
     mood: moodFilter || "",
     category: categoryFilter || "",
+    audience: audienceFilter || "",
     q
   });
 });
@@ -749,11 +779,13 @@ app.post("/api/ai/greeting", async (req, res) => {
   const festival = safePick(body.festival || "Holi", ALLOWED_FESTIVALS, "Holi");
   const mood = safePick(body.mood || "Celebration", ALLOWED_MOODS, "Celebration");
   const category = safePick(body.category, new Set(["Mood", "Festival"]), "Festival");
+  const audience = safePick(body.audience || "friend", ALLOWED_AUDIENCES, "friend");
   const tone = trimText(body.tone || "Warm", 24) || "Warm";
   const friendName = trimText(body.friendName, 80);
   const contextWord = category === "Mood" ? mood : festival;
-  const prompt = trimText(body.prompt || `Generate a short ${tone} message for ${contextWord}`, 220);
-  const fallbackMessage = `Sending ${tone.toLowerCase()} ${contextWord.toLowerCase()} vibes${friendName ? ", " + friendName : ""}.`;
+  const audienceLabel = AUDIENCE_LABELS[audience] || "friend";
+  const prompt = trimText(body.prompt || `Generate a short ${tone} message for my ${audienceLabel} about ${contextWord}`, 220);
+  const fallbackMessage = `Sending ${tone.toLowerCase()} ${contextWord.toLowerCase()} vibes to my ${audienceLabel}${friendName ? ", " + friendName : ""}.`;
   const hfToken = (process.env.HF_API_TOKEN || "").trim();
 
   try {
@@ -812,13 +844,16 @@ app.get("/api/prompts/daily", (req, res) => {
 app.get("/api/stats", (req, res) => {
   const byFestival = {};
   const byMood = {};
+  const byAudience = {};
   let totalViews = 0;
   let totalReactions = 0;
   for (const wish of wishesStore.values()) {
     const f = wish.festival || "Festival";
     const m = wish.mood || "Celebration";
+    const a = wish.audience || "friend";
     byFestival[f] = Number(byFestival[f] || 0) + 1;
     byMood[m] = Number(byMood[m] || 0) + 1;
+    byAudience[a] = Number(byAudience[a] || 0) + 1;
     totalViews += Number(wish.views || 0);
     totalReactions += Object.values(normalizeReactions(wish.reactions)).reduce((s, n) => s + Number(n || 0), 0);
   }
@@ -827,7 +862,8 @@ app.get("/api/stats", (req, res) => {
     totalViews,
     totalReactions,
     byFestival,
-    byMood
+    byMood,
+    byAudience
   });
 });
 

@@ -580,6 +580,18 @@ input[type="range"] {
   gap: 8px;
 }
 
+.template-grid {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.template-grid button {
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
 .anon-helper {
   font-size: 0.84rem;
   color: var(--muted);
@@ -862,6 +874,16 @@ body.wish-mode #musicSection {
       <div class="form-grid" style="margin-top:12px;">
         <input id="senderInput" type="text" placeholder="Your name (sender)">
         <input id="nameInput" type="text" placeholder="Enter friend name">
+        <select id="audienceInput" aria-label="Audience">
+          <option value="friend">Best Friend</option>
+          <option value="crush">Crush</option>
+          <option value="partner">Partner</option>
+          <option value="sibling">Sibling</option>
+          <option value="family">Family</option>
+          <option value="colleague">Colleague</option>
+          <option value="classmate">Classmate</option>
+          <option value="community">Community</option>
+        </select>
         <select id="festivalInput" aria-label="Festival">
           <option value="Holi">Holi</option>
           <option value="Diwali">Diwali</option>
@@ -905,6 +927,16 @@ body.wish-mode #musicSection {
       </div>
       <div style="margin-top:10px;">
         <textarea id="messageInput" placeholder="Enter your custom message"></textarea>
+      </div>
+      <div class="mini-panel">
+        <div class="meta-line">Quick message styles for repeat daily use</div>
+        <div class="template-grid">
+          <button type="button" onclick="applyMessagePreset('sweet')">Sweet</button>
+          <button type="button" onclick="applyMessagePreset('supportive')">Supportive</button>
+          <button type="button" onclick="applyMessagePreset('funny')">Funny</button>
+          <button type="button" onclick="applyMessagePreset('short')">Short</button>
+        </div>
+        <div id="templateStatus" class="meta-line" style="margin-top:8px;">Target a category and audience to generate a better default message.</div>
       </div>
       <div class="controls-row" style="margin-top:10px;">
         <button class="primary" onclick="generateLink()">Generate Share Link</button>
@@ -1032,6 +1064,17 @@ body.wish-mode #musicSection {
           <option value="Christmas">Christmas</option>
           <option value="New Year">New Year</option>
           <option value="Raksha Bandhan">Raksha Bandhan</option>
+        </select>
+        <select id="recentAudienceFilter" aria-label="Filter by audience">
+          <option value="">All Audiences</option>
+          <option value="friend">Best Friend</option>
+          <option value="crush">Crush</option>
+          <option value="partner">Partner</option>
+          <option value="sibling">Sibling</option>
+          <option value="family">Family</option>
+          <option value="colleague">Colleague</option>
+          <option value="classmate">Classmate</option>
+          <option value="community">Community</option>
         </select>
         <input id="recentSearchInput" type="text" placeholder="Search name or message">
         <button onclick="refreshRecentWishes()">Refresh</button>
@@ -1209,6 +1252,7 @@ const categoryInput = document.getElementById("categoryInput");
 const moodInput = document.getElementById("moodInput");
 const aiToneInput = document.getElementById("aiToneInput");
 const festivalInput = document.getElementById("festivalInput");
+const audienceInput = document.getElementById("audienceInput");
 const themeInput = document.getElementById("themeInput");
 const festivalTag = document.getElementById("festivalTag");
 const spotifyInput = document.getElementById("spotifyInput");
@@ -1221,6 +1265,7 @@ const anonymousHelper = document.getElementById("anonymousHelper");
 const previewTitle = document.getElementById("previewTitle");
 const previewMessage = document.getElementById("previewMessage");
 const previewMeta = document.getElementById("previewMeta");
+const templateStatus = document.getElementById("templateStatus");
 const dailyPromptEl = document.getElementById("dailyPrompt");
 const trendingWishesEl = document.getElementById("trendingWishes");
 const randomConfessionEl = document.getElementById("randomConfession");
@@ -1228,6 +1273,58 @@ let generatedShareLink = "";
 let activeWishId = "";
 const ANON_PREFIXES = ["Hidden", "Silent", "Midnight", "Velvet", "Mystic", "Secret", "Neon", "Cosmic"];
 const ANON_SUFFIXES = ["Rang", "Splash", "Spark", "Echo", "Whisper", "Glow", "Mask", "Note"];
+const AUDIENCE_LABELS = {
+  friend: "best friend",
+  crush: "crush",
+  partner: "partner",
+  sibling: "sibling",
+  family: "family",
+  colleague: "colleague",
+  classmate: "classmate",
+  community: "community"
+};
+const AUDIENCE_TEMPLATES = {
+  sweet: {
+    friend: "You make ordinary days feel lighter. Sending you good vibes always",
+    crush: "You have been on my mind more than I admit. Sending a soft little smile your way",
+    partner: "Life feels calmer and brighter with you in it. I am lucky to share this with you",
+    sibling: "You annoy me and still mean the world to me. Sending love your way",
+    family: "Home feels warmer because of you. Sending love and gratitude today",
+    colleague: "Thanks for making the workday easier and more human. Wishing you a bright day",
+    classmate: "You make classes feel less heavy and a lot more fun. Sending good energy",
+    community: "Grateful for the warmth and support in this circle. Sending positive energy to everyone"
+  },
+  supportive: {
+    friend: "Whatever today looks like, I am in your corner and rooting for you",
+    crush: "No pressure, just a reminder that I genuinely hope your day goes beautifully",
+    partner: "Even on messy days, we are a team. I am with you",
+    sibling: "No matter what happens, you do not have to handle it alone",
+    family: "Sending steady love, calm energy, and strength for the day ahead",
+    colleague: "Hope work feels lighter today. You are doing better than you think",
+    classmate: "One task at a time. You have got more strength than you feel right now",
+    community: "Wishing everyone here steadiness, care, and better days ahead"
+  },
+  funny: {
+    friend: "Official reminder: being iconic is tiring, so please hydrate and keep winning",
+    crush: "This is your daily notice that you are suspiciously cute and probably overqualified for being this charming",
+    partner: "You still owe me at least one dramatic movie moment and one snack run",
+    sibling: "I would roast you more, but today I am choosing peace and affection",
+    family: "Sending love with only 12 percent less chaos than usual",
+    colleague: "May your meetings be short and your notifications somehow disappear",
+    classmate: "May attendance be kind, deadlines be fake, and snacks be available",
+    community: "Manifesting fewer problems, more food, and zero unnecessary drama for everyone"
+  },
+  short: {
+    friend: "Thinking of you and sending good energy",
+    crush: "A small note, but a real one: hope your day feels good",
+    partner: "With you, always",
+    sibling: "Love you, even when I act dramatic",
+    family: "Sending warmth and gratitude today",
+    colleague: "Hope your day goes smoothly",
+    classmate: "Good luck today, you have this",
+    community: "Sending good vibes to everyone here"
+  }
+};
 
 function normalizeBase(urlLike) {
   if (!urlLike) return "";
@@ -1274,6 +1371,7 @@ const aliasFromUrl = params.get("alias") || "";
 const categoryFromUrl = params.get("category") || "Festival";
 const moodFromUrl = params.get("mood") || "Celebration";
 const festivalFromUrl = params.get("festival") || "Holi";
+const audienceFromUrl = params.get("audience") || "friend";
 const messageFromUrl = params.get("message") || "";
 const themeFromUrl = params.get("theme") || "holi";
 const anonymousFromUrl = params.get("anonymous") === "1";
@@ -1287,6 +1385,9 @@ if (moodInput.querySelector(`option[value="${moodFromUrl}"]`)) {
 if (festivalInput.querySelector(`option[value="${festivalFromUrl}"]`)) {
   festivalInput.value = festivalFromUrl;
 }
+if (audienceInput.querySelector(`option[value="${audienceFromUrl}"]`)) {
+  audienceInput.value = audienceFromUrl;
+}
 if (themeInput.querySelector(`option[value="${themeFromUrl}"]`)) {
   themeInput.value = themeFromUrl;
 }
@@ -1299,6 +1400,7 @@ updateFestivalUi();
 updateCategoryUi();
 applyTheme(themeInput.value);
 syncAnonymousUi();
+syncAudienceUi();
 updateTitle();
 updatePreviewCard();
 
@@ -1313,12 +1415,16 @@ categoryInput.addEventListener("change", () => {
   updateTitle();
   updatePreviewCard();
   updateThoughtText();
+  refreshRecentWishes();
+  refreshTrendingWishes();
   saveDraft();
 });
 moodInput.addEventListener("change", () => {
   updateTitle();
   updatePreviewCard();
   updateThoughtText();
+  refreshRecentWishes();
+  refreshTrendingWishes();
   saveDraft();
 });
 festivalInput.addEventListener("change", () => {
@@ -1327,6 +1433,16 @@ festivalInput.addEventListener("change", () => {
   updateTitle();
   updatePreviewCard();
   tickCountdown();
+  refreshRecentWishes();
+  refreshTrendingWishes();
+  saveDraft();
+});
+audienceInput.addEventListener("change", () => {
+  syncAudienceUi();
+  updateTitle();
+  updatePreviewCard();
+  refreshRecentWishes();
+  refreshTrendingWishes();
   saveDraft();
 });
 themeInput.addEventListener("change", () => {
@@ -1420,6 +1536,7 @@ function updateTitle() {
   const n = nameInput.value.trim();
   const f = festivalInput.value || "Festival";
   const context = category === "Mood" ? mood : f;
+  const audienceLabel = AUDIENCE_LABELS[audienceInput.value] || "someone";
   document.title = context + " Card | FestivalHub";
   if (n) {
     titleEl.textContent = category === "Mood"
@@ -1427,7 +1544,7 @@ function updateTitle() {
       : "Happy " + f + ", " + n + "!";
     return;
   }
-  typeTitle("Create a " + context + " Card");
+  typeTitle("Create a " + context + " Card for your " + audienceLabel);
 }
 
 function updateFestivalUi() {
@@ -1456,9 +1573,35 @@ function updatePreviewCard() {
   const sender = getSenderDisplayName();
   const msg = messageInput.value.trim() || ("Sending " + context + " vibes to you!");
   const song = spotifyInput.value.trim() || "Not selected";
+  const audienceLabel = AUDIENCE_LABELS[audienceInput.value] || "friend";
   if (previewTitle) previewTitle.textContent = emoji + " " + context + " card for " + friend;
   if (previewMessage) previewMessage.textContent = "\"" + msg + "\"";
-  if (previewMeta) previewMeta.textContent = "From: " + sender + " | Music: " + song + " | Theme: " + (themeInput.value || "holi");
+  if (previewMeta) previewMeta.textContent = "From: " + sender + " | For: " + audienceLabel + " | Music: " + song + " | Theme: " + (themeInput.value || "holi");
+}
+
+function syncAudienceUi() {
+  const audienceLabel = AUDIENCE_LABELS[audienceInput.value] || "friend";
+  if (!templateStatus) return;
+  templateStatus.textContent = "Optimized for your " + audienceLabel + ". Use a quick style or generate an AI message.";
+}
+
+function buildPresetMessage(style) {
+  const audience = audienceInput.value || "friend";
+  const category = categoryInput.value || "Festival";
+  const mood = moodInput.value || "Celebration";
+  const festival = festivalInput.value || "Holi";
+  const friendName = nameInput.value.trim();
+  const base = (AUDIENCE_TEMPLATES[style] && AUDIENCE_TEMPLATES[style][audience]) || AUDIENCE_TEMPLATES.short.friend;
+  const contextWord = category === "Mood" ? mood.toLowerCase() : festival;
+  const nameTail = friendName ? ", " + friendName : "";
+  return base + nameTail + ". " + (category === "Mood" ? ("Today feels like a " + contextWord + " kind of message.") : ("Happy " + festival + "!"));
+}
+
+function applyMessagePreset(style) {
+  messageInput.value = buildPresetMessage(style);
+  thoughtEl.textContent = "\"" + messageInput.value + "\"";
+  updatePreviewCard();
+  saveDraft();
 }
 
 function getFestivalThoughts() {
@@ -1521,6 +1664,7 @@ const shareStatus = document.getElementById("shareStatus");
 const statsLine = document.getElementById("statsLine");
 const recentWishesEl = document.getElementById("recentWishes");
 const recentFestivalFilter = document.getElementById("recentFestivalFilter");
+const recentAudienceFilter = document.getElementById("recentAudienceFilter");
 const recentSearchInput = document.getElementById("recentSearchInput");
 const DRAFT_KEY = "festivalhub_draft_v1";
 const ADMIN_PIN_KEY = "festivalhub_admin_pin";
@@ -1538,6 +1682,7 @@ function buildFallbackWishLink(base, payload) {
   url.searchParams.set("category", payload.category);
   url.searchParams.set("mood", payload.mood);
   url.searchParams.set("festival", payload.festival);
+  url.searchParams.set("audience", payload.audience || "friend");
   if (!payload.anonymous && payload.senderName) url.searchParams.set("from", payload.senderName);
   if (payload.anonymous) url.searchParams.set("anonymous", "1");
   if (payload.anonymousAlias) url.searchParams.set("alias", payload.anonymousAlias);
@@ -1557,6 +1702,9 @@ function renderWishGreeting(data) {
     moodInput.value = data.mood;
   }
   festivalInput.value = data.festival || "Holi";
+  if (data.audience && audienceInput.querySelector(`option[value="${data.audience}"]`)) {
+    audienceInput.value = data.audience;
+  }
   senderInput.value = data.senderName || "";
   anonymousInput.checked = !!data.anonymous;
   anonymousAliasInput.value = data.anonymousAlias || data.senderDisplayName || "";
@@ -1568,6 +1716,7 @@ function renderWishGreeting(data) {
     applyTheme(themeInput.value);
   }
   syncAnonymousUi();
+  syncAudienceUi();
   updateFestivalUi();
   updateCategoryUi();
   updateTitle();
@@ -1583,6 +1732,7 @@ function renderWishGreeting(data) {
   const emoji = data.category === "Mood" ? "🎭" : (FESTIVAL_EMOJI[data.festival] || "🎉");
   const contextWord = data.category === "Mood" ? (data.mood || "Mood") : (data.festival || "Festival");
   const senderDisplay = data.senderDisplayName || (data.anonymous ? (data.anonymousAlias || "Someone") : (data.senderName || "Friend"));
+  const audienceLabel = AUDIENCE_LABELS[data.audience] || "friend";
   const views = Number(data.views || 0);
   const viewsLabel = views === 1 ? "person" : "people";
   const reactionTotal = Object.values(data.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
@@ -1590,7 +1740,7 @@ function renderWishGreeting(data) {
   if (wishTitle) wishTitle.textContent = emoji + " " + contextWord + " card for " + (data.friendName || "Friend");
   if (wishFrom) wishFrom.textContent = "Message from " + senderDisplay;
   if (wishMessage) wishMessage.textContent = "\"" + (data.message || "Wishing you joy and happiness.") + "\"";
-  if (wishSong) wishSong.textContent = "Music: " + (data.music || "Not selected");
+  if (wishSong) wishSong.textContent = "For: " + audienceLabel + " | Music: " + (data.music || "Not selected");
   if (wishViews) wishViews.textContent = "👀 " + views + " " + viewsLabel + " viewed this greeting";
   if (wishReactions) wishReactions.textContent = "Reactions: " + reactionTotal;
 }
@@ -1605,6 +1755,7 @@ async function generateLink() {
   const selectedFestival = festivalInput.value || "Holi";
   const selectedCategory = categoryInput.value || "Festival";
   const selectedMood = moodInput.value || "Celebration";
+  const selectedAudience = audienceInput.value || "friend";
   const selectedSender = senderInput.value.trim();
   const selectedAlias = anonymousInput.checked ? ensureAnonymousAlias(false) : "";
   const selectedName = nameInput.value.trim();
@@ -1614,6 +1765,7 @@ async function generateLink() {
     category: selectedCategory,
     mood: selectedMood,
     festival: selectedFestival,
+    audience: selectedAudience,
     senderName: selectedSender,
     anonymous: !!anonymousInput.checked,
     anonymousAlias: selectedAlias,
@@ -1701,6 +1853,7 @@ function loadWishFromQueryIfNeeded() {
     category: categoryInput.value || "Festival",
     mood: moodInput.value || "Celebration",
     festival: festivalInput.value || "Holi",
+    audience: audienceInput.value || "friend",
     senderName: anonymousInput.checked ? "" : senderInput.value.trim(),
     senderDisplayName: anonymousInput.checked ? ensureAnonymousAlias(false) : (senderInput.value.trim() || "Friend"),
     anonymous: !!anonymousInput.checked,
@@ -1729,6 +1882,7 @@ function remixGreeting() {
   url.searchParams.set("category", categoryInput.value || "Festival");
   url.searchParams.set("mood", moodInput.value || "Celebration");
   url.searchParams.set("festival", festivalInput.value || "Holi");
+  url.searchParams.set("audience", audienceInput.value || "friend");
   if (!anonymousInput.checked && senderInput.value.trim()) url.searchParams.set("from", senderInput.value.trim());
   if (anonymousInput.checked) url.searchParams.set("anonymous", "1");
   if (anonymousInput.checked && anonymousAliasInput.value.trim()) url.searchParams.set("alias", anonymousAliasInput.value.trim());
@@ -1755,7 +1909,10 @@ async function refreshStats() {
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
-    statsLine.textContent = "Total wishes: " + Number(data.totalWishes || 0) + " | Total opens: " + Number(data.totalViews || 0) + " | Reactions: " + Number(data.totalReactions || 0);
+    const byAudience = data.byAudience || {};
+    const topAudience = Object.keys(byAudience).sort((a, b) => Number(byAudience[b] || 0) - Number(byAudience[a] || 0))[0] || "";
+    const audienceText = topAudience ? (" | Top audience: " + (AUDIENCE_LABELS[topAudience] || topAudience)) : "";
+    statsLine.textContent = "Total wishes: " + Number(data.totalWishes || 0) + " | Total opens: " + Number(data.totalViews || 0) + " | Reactions: " + Number(data.totalReactions || 0) + audienceText;
   } catch (_) {}
 }
 
@@ -1805,7 +1962,7 @@ function renderTrending(items) {
     const context = item.category === "Mood" ? (item.mood || "Mood") : (item.festival || "Festival");
     const reacts = Object.values(item.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
     title.textContent = context + (item.friendName ? " for " + item.friendName : "");
-    sub.textContent = "Views: " + Number(item.views || 0) + " | Reactions: " + reacts;
+    sub.textContent = "Audience: " + (AUDIENCE_LABELS[item.audience] || "friend") + " | Views: " + Number(item.views || 0) + " | Reactions: " + reacts;
     openBtn.textContent = "Open";
     openBtn.onclick = () => {
       const link = publicWishLink(item.id);
@@ -1823,6 +1980,7 @@ async function refreshTrendingWishes() {
   try {
     const endpoint = new URL("/api/wishes/trending", activeApiBase);
     endpoint.searchParams.set("limit", "6");
+    endpoint.searchParams.set("audience", audienceInput.value || "friend");
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
@@ -1920,7 +2078,7 @@ function renderRecentWishes(items) {
     titleElx.textContent = title;
     subMsg.textContent = messageSnippet + (messageSnippet.length === 60 ? "..." : "");
     subDate.textContent = fmtShortDate(item.createdAt);
-    subViews.textContent = "Opens: " + Number(item.views || 0) + " | Reactions: " + reactions;
+    subViews.textContent = "For: " + (AUDIENCE_LABELS[item.audience] || "friend") + " | Opens: " + Number(item.views || 0) + " | Reactions: " + reactions;
 
     actions.appendChild(openBtn);
     actions.appendChild(copyBtn);
@@ -1941,6 +2099,9 @@ async function refreshRecentWishes() {
     endpoint.searchParams.set("limit", "8");
     if (recentFestivalFilter && recentFestivalFilter.value) {
       endpoint.searchParams.set("festival", recentFestivalFilter.value);
+    }
+    if (recentAudienceFilter && recentAudienceFilter.value) {
+      endpoint.searchParams.set("audience", recentAudienceFilter.value);
     }
     if (categoryInput.value === "Mood" && moodInput.value) {
       endpoint.searchParams.set("category", "Mood");
@@ -2014,6 +2175,9 @@ if (recentWishesEl) {
 if (recentFestivalFilter) {
   recentFestivalFilter.addEventListener("change", refreshRecentWishes);
 }
+if (recentAudienceFilter) {
+  recentAudienceFilter.addEventListener("change", refreshRecentWishes);
+}
 if (recentSearchInput) {
   recentSearchInput.addEventListener("input", () => {
     clearTimeout(window.__recentSearchTimer);
@@ -2029,6 +2193,7 @@ function saveDraft() {
       category: categoryInput.value || "Festival",
       mood: moodInput.value || "Celebration",
       aiTone: aiToneInput.value || "Romantic",
+      audience: audienceInput.value || "friend",
       senderName: senderInput.value || "",
       anonymousAlias: anonymousAliasInput.value || "",
       friendName: nameInput.value || "",
@@ -2057,10 +2222,12 @@ function clearDraft() {
   categoryInput.value = "Festival";
   moodInput.value = "Celebration";
   aiToneInput.value = "Romantic";
+  audienceInput.value = "friend";
   festivalInput.value = "Holi";
   themeInput.value = "holi";
   applyTheme("holi");
   syncAnonymousUi();
+  syncAudienceUi();
   updateFestivalUi();
   updateCategoryUi();
   updateTitle();
@@ -2090,6 +2257,7 @@ function restoreDraftIfNeeded() {
     !!params.get("mode") ||
     !!params.get("message") ||
     !!params.get("festival") ||
+    !!params.get("audience") ||
     !!params.get("song") ||
     !!params.get("spotify") ||
     /\/wish\/[a-zA-Z0-9_-]+/.test(window.location.pathname);
@@ -2110,6 +2278,9 @@ function restoreDraftIfNeeded() {
     if (draft.aiTone && aiToneInput.querySelector(`option[value="${draft.aiTone}"]`)) {
       aiToneInput.value = draft.aiTone;
     }
+    if (draft.audience && audienceInput.querySelector(`option[value="${draft.audience}"]`)) {
+      audienceInput.value = draft.audience;
+    }
     if (draft.category && categoryInput.querySelector(`option[value="${draft.category}"]`)) {
       categoryInput.value = draft.category;
     }
@@ -2125,6 +2296,7 @@ function restoreDraftIfNeeded() {
       applyTheme(themeInput.value);
     }
     syncAnonymousUi();
+    syncAudienceUi();
     updateFestivalUi();
     updateCategoryUi();
     updateTitle();
@@ -2138,22 +2310,24 @@ async function generateAiMessage() {
   const mood = moodInput.value || "Celebration";
   const festival = festivalInput.value || "Holi";
   const tone = aiToneInput.value || "Romantic";
+  const audience = audienceInput.value || "friend";
+  const audienceLabel = AUDIENCE_LABELS[audience] || "friend";
   const friendName = nameInput.value.trim();
   const contextWord = category === "Mood" ? mood : festival;
-  const prompt = "Generate a " + tone + " " + contextWord + " message" + (friendName ? (" for " + friendName) : "");
+  const prompt = "Generate a " + tone + " " + contextWord + " message for my " + audienceLabel + (friendName ? (" named " + friendName) : "");
   try {
     const endpoint = new URL("/api/ai/greeting", activeApiBase);
     const res = await fetch(endpoint.toString(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, category, mood, festival, tone, friendName })
+      body: JSON.stringify({ prompt, category, mood, festival, tone, friendName, audience })
     });
     if (!res.ok) throw new Error("ai_failed");
     const data = await res.json();
     messageInput.value = data.message || "";
     thoughtEl.textContent = "\"" + (data.message || "Wishing you joy and success.") + "\"";
   } catch (_) {
-    const fallback = "Sending " + tone.toLowerCase() + " " + contextWord.toLowerCase() + " vibes" + (friendName ? ", " + friendName : "") + "!";
+    const fallback = "Sending " + tone.toLowerCase() + " " + contextWord.toLowerCase() + " vibes to my " + audienceLabel + (friendName ? ", " + friendName : "") + "!";
     messageInput.value = fallback;
     thoughtEl.textContent = "\"" + fallback + "\"";
   }
