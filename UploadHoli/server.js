@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const fetchImpl = global.fetch || require("node-fetch");
 
 const app = express();
@@ -58,6 +59,7 @@ const ALLOWED_AUDIENCES = new Set([
   "classmate",
   "community"
 ]);
+const ALLOWED_VISIBILITY = new Set(["public", "private"]);
 const AUDIENCE_LABELS = {
   friend: "best friend",
   crush: "crush",
@@ -199,6 +201,21 @@ function normalizeReactions(raw) {
   return base;
 }
 
+function wishReactionTotal(wish) {
+  return Object.values(normalizeReactions(wish?.reactions)).reduce((sum, value) => sum + Number(value || 0), 0);
+}
+
+function wishEngagementScore(wish) {
+  return Number(wish?.views || 0) * 1.7 + wishReactionTotal(wish) * 4;
+}
+
+function topCountEntry(mapLike) {
+  const entries = Object.entries(mapLike || {});
+  if (!entries.length) return { key: "", count: 0 };
+  const [key, count] = entries.sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0))[0];
+  return { key, count: Number(count || 0) };
+}
+
 function randomFrom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
@@ -207,6 +224,59 @@ function buildAnonymousAlias(rawAlias) {
   const alias = trimText(rawAlias || "", 40).replace(/\s+/g, " ");
   if (alias) return alias;
   return `${randomFrom(ANON_PREFIXES)} ${randomFrom(ANON_SUFFIXES)}`;
+}
+
+function hashAccessCode(value) {
+  const normalized = trimText(value || "", 64);
+  if (!normalized) return "";
+  return crypto.createHash("sha256").update(normalized).digest("hex");
+}
+
+function getProvidedAccessCode(req) {
+  const fromHeader = trimText(req.get("x-wish-code") || "", 64);
+  const fromQuery = trimText(req.query.access || "", 64);
+  if (fromHeader) return fromHeader;
+  if (fromQuery) return fromQuery;
+  return "";
+}
+
+function isWishExpired(wish) {
+  if (!wish?.expiresAt) return false;
+  const ts = Date.parse(wish.expiresAt);
+  return Number.isFinite(ts) && Date.now() > ts;
+}
+
+function isWishPubliclyListed(wish) {
+  return (wish?.visibility || "public") === "public" && !isWishExpired(wish);
+}
+
+function wishRequiresAccessCode(wish) {
+  return !!(wish?.accessCodeHash && String(wish.accessCodeHash).trim());
+}
+
+function validateWishAccess(req, wish) {
+  if (!wish) {
+    return { ok: false, status: 404, body: { error: "wish_not_found" } };
+  }
+  if (isWishExpired(wish)) {
+    return { ok: false, status: 410, body: { error: "wish_expired", message: "This greeting link has expired." } };
+  }
+  if ((wish.visibility || "public") === "private" && wishRequiresAccessCode(wish)) {
+    const providedCode = getProvidedAccessCode(req);
+    if (!providedCode || hashAccessCode(providedCode) !== wish.accessCodeHash) {
+      return {
+        ok: false,
+        status: 403,
+        body: {
+          error: "wish_access_code_required",
+          message: "This private greeting requires an access code.",
+          accessCodeRequired: true,
+          visibility: "private"
+        }
+      };
+    }
+  }
+  return { ok: true };
 }
 
 function toPublicWish(wish) {
@@ -218,7 +288,10 @@ function toPublicWish(wish) {
       ? buildAnonymousAlias(wish?.anonymousAlias || wish?.senderDisplayName || "")
       : (wish?.senderName || "Friend"),
     anonymousAlias: anonymous ? buildAnonymousAlias(wish?.anonymousAlias || wish?.senderDisplayName || "") : "",
-    anonymous
+    anonymous,
+    accessCodeHash: undefined,
+    accessCodeRequired: wishRequiresAccessCode(wish),
+    expired: isWishExpired(wish)
   };
 }
 
@@ -236,9 +309,12 @@ function loadWishesFromDisk() {
         mood: safePick(wish.mood, ALLOWED_MOODS, "Celebration"),
         festival: safePick(wish.festival, ALLOWED_FESTIVALS, "Holi"),
         audience: safePick(wish.audience, ALLOWED_AUDIENCES, "friend"),
+        visibility: safePick(wish.visibility, ALLOWED_VISIBILITY, "public"),
         theme: safePick(wish.theme, ALLOWED_THEMES, "holi"),
         anonymous: !!wish.anonymous,
         anonymousAlias: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : "",
+        accessCodeHash: trimText(wish.accessCodeHash || "", 128),
+        expiresAt: trimText(wish.expiresAt || "", 40),
         views: Number(wish.views || 0),
         reactions: normalizeReactions(wish.reactions)
       };
@@ -598,19 +674,30 @@ app.post("/api/wishes", (req, res) => {
   const mood = safePick(body.mood || "Celebration", ALLOWED_MOODS, "Celebration");
   const festival = safePick(body.festival || "Holi", ALLOWED_FESTIVALS, "Holi");
   const audience = safePick(body.audience || "friend", ALLOWED_AUDIENCES, "friend");
+  const visibility = safePick(body.visibility || "public", ALLOWED_VISIBILITY, "public");
   const anonymous = !!body.anonymous;
   const senderName = trimText(body.senderName || "", 80);
   const anonymousAlias = anonymous ? buildAnonymousAlias(body.anonymousAlias || "") : "";
   const friendName = trimText(body.friendName, 80);
+  const accessCode = trimText(body.accessCode || "", 64);
+  const expiresInDaysRaw = Number(body.expiresInDays || 0);
+  const expiresInDays = Number.isFinite(expiresInDaysRaw) ? Math.max(0, Math.min(30, Math.floor(expiresInDaysRaw))) : 0;
   const contextWord = category === "Mood" ? mood : festival;
   const defaultMessage = `Wishing you joy and positivity. ${contextWord} vibes${friendName ? " for " + friendName : ""}!`;
   const message = trimText(body.message || defaultMessage, 400);
-  if (isSpamText(message) || isSpamText(senderName) || isSpamText(friendName) || isSpamText(anonymousAlias)) {
+  if (isSpamText(message) || isSpamText(senderName) || isSpamText(friendName) || isSpamText(anonymousAlias) || isSpamText(accessCode)) {
     return res.status(400).json({
       error: "spam_detected",
       message: "Input looks spammy. Remove links or repeated characters."
     });
   }
+  if (accessCode && accessCode.length < 4) {
+    return res.status(400).json({
+      error: "access_code_too_short",
+      message: "Access code must be at least 4 characters."
+    });
+  }
+  const expiresAt = expiresInDays > 0 ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString() : "";
 
   const wish = {
     id,
@@ -618,6 +705,7 @@ app.post("/api/wishes", (req, res) => {
     mood,
     festival,
     audience,
+    visibility,
     senderName,
     senderDisplayName: anonymous ? anonymousAlias : senderName,
     anonymous,
@@ -628,6 +716,8 @@ app.post("/api/wishes", (req, res) => {
     music: trimText(body.music, 200),
     musicStyle: trimText(body.musicStyle || "", 40),
     theme: safePick(body.theme || "holi", ALLOWED_THEMES, "holi"),
+    accessCodeHash: accessCode ? hashAccessCode(accessCode) : "",
+    expiresAt,
     views: 0,
     lastViewedAt: "",
     reactions: { love: 0, funny: 0, emotional: 0, romantic: 0 },
@@ -644,19 +734,18 @@ app.get("/api/wishes/trending", (req, res) => {
   const mood = trimText(req.query.mood || "", 40);
   const festival = trimText(req.query.festival || "", 40);
   const audience = trimText(req.query.audience || "", 40);
+  const category = trimText(req.query.category || "", 20);
   const items = Array.from(wishesStore.values())
     .filter((wish) => {
+      if (!isWishPubliclyListed(wish)) return false;
+      if (category && wish.category !== category) return false;
       if (mood && wish.mood !== mood) return false;
       if (festival && wish.festival !== festival) return false;
       if (audience && wish.audience !== audience) return false;
       return true;
     })
     .sort((a, b) => {
-      const aReacts = Object.values(normalizeReactions(a.reactions)).reduce((s, n) => s + Number(n || 0), 0);
-      const bReacts = Object.values(normalizeReactions(b.reactions)).reduce((s, n) => s + Number(n || 0), 0);
-      const aScore = Number(a.views || 0) * 1.7 + aReacts * 4;
-      const bScore = Number(b.views || 0) * 1.7 + bReacts * 4;
-      return bScore - aScore;
+      return wishEngagementScore(b) - wishEngagementScore(a);
     })
     .slice(0, limit)
     .map((wish) => ({
@@ -671,14 +760,15 @@ app.get("/api/wishes/trending", (req, res) => {
       reactions: normalizeReactions(wish.reactions),
       createdAt: wish.createdAt
     }));
-  return res.json({ items, limit });
+  return res.json({ items, limit, category, mood, festival, audience });
 });
 
 app.get("/api/wishes/:id", (req, res) => {
   const id = trimText(req.params.id, 40);
   const wish = wishesStore.get(id);
-  if (!wish) {
-    return res.status(404).json({ error: "wish_not_found" });
+  const access = validateWishAccess(req, wish);
+  if (!access.ok) {
+    return res.status(access.status).json(access.body);
   }
   wish.views = Number(wish.views || 0) + 1;
   wish.lastViewedAt = new Date().toISOString();
@@ -690,8 +780,9 @@ app.get("/api/wishes/:id", (req, res) => {
 app.post("/api/wishes/:id/reactions", (req, res) => {
   const id = trimText(req.params.id, 40);
   const wish = wishesStore.get(id);
-  if (!wish) {
-    return res.status(404).json({ error: "wish_not_found" });
+  const access = validateWishAccess(req, wish);
+  if (!access.ok) {
+    return res.status(access.status).json(access.body);
   }
   const reaction = trimText(req.body?.reaction || "", 20).toLowerCase();
   if (!ALLOWED_REACTIONS.has(reaction)) {
@@ -713,14 +804,18 @@ app.post("/api/wishes/:id/reactions", (req, res) => {
 
 app.get("/api/wishes", (req, res) => {
   const limitRaw = Number(req.query.limit || 5);
+  const offsetRaw = Number(req.query.offset || 0);
   const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(20, limitRaw)) : 5;
+  const offset = Number.isFinite(offsetRaw) ? Math.max(0, Math.floor(offsetRaw)) : 0;
   const festivalFilter = trimText(req.query.festival || "", 40);
   const moodFilter = trimText(req.query.mood || "", 40);
   const categoryFilter = trimText(req.query.category || "", 20);
   const audienceFilter = trimText(req.query.audience || "", 40);
+  const sort = trimText(req.query.sort || "recent", 20);
   const q = trimText(req.query.q || "", 80).toLowerCase();
-  const items = Array.from(wishesStore.values())
+  const filtered = Array.from(wishesStore.values())
     .filter((wish) => {
+      if (!isWishPubliclyListed(wish)) return false;
       if (festivalFilter && wish.festival !== festivalFilter) return false;
       if (moodFilter && wish.mood !== moodFilter) return false;
       if (categoryFilter && wish.category !== categoryFilter) return false;
@@ -728,9 +823,20 @@ app.get("/api/wishes", (req, res) => {
       if (!q) return true;
       const text = `${wish.friendName || ""} ${wish.message || ""} ${wish.festival || ""} ${wish.mood || ""} ${wish.audience || ""}`.toLowerCase();
       return text.includes(q);
-    })
-    .sort((a, b) => Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0))
-    .slice(0, limit)
+    });
+  filtered.sort((a, b) => {
+    if (sort === "popular") {
+      const scoreGap = wishEngagementScore(b) - wishEngagementScore(a);
+      if (scoreGap !== 0) return scoreGap;
+    } else if (sort === "views") {
+      const viewGap = Number(b.views || 0) - Number(a.views || 0);
+      if (viewGap !== 0) return viewGap;
+    }
+    return Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0);
+  });
+  const total = filtered.length;
+  const items = filtered
+    .slice(offset, offset + limit)
     .map((wish) => ({
       id: wish.id,
       category: wish.category || "Festival",
@@ -752,10 +858,14 @@ app.get("/api/wishes", (req, res) => {
   return res.json({
     items,
     limit,
+    offset,
+    total,
+    hasMore: offset + items.length < total,
     festival: festivalFilter || "",
     mood: moodFilter || "",
     category: categoryFilter || "",
     audience: audienceFilter || "",
+    sort: sort || "recent",
     q
   });
 });
@@ -845,25 +955,66 @@ app.get("/api/stats", (req, res) => {
   const byFestival = {};
   const byMood = {};
   const byAudience = {};
+  const byTheme = {};
   let totalViews = 0;
   let totalReactions = 0;
+  let recentWishes24h = 0;
+  let lastCreatedAt = "";
+  let totalPublicWishes = 0;
+  let totalPrivateWishes = 0;
+  const now = Date.now();
   for (const wish of wishesStore.values()) {
+    if (isWishExpired(wish)) continue;
     const f = wish.festival || "Festival";
     const m = wish.mood || "Celebration";
     const a = wish.audience || "friend";
-    byFestival[f] = Number(byFestival[f] || 0) + 1;
-    byMood[m] = Number(byMood[m] || 0) + 1;
-    byAudience[a] = Number(byAudience[a] || 0) + 1;
-    totalViews += Number(wish.views || 0);
-    totalReactions += Object.values(normalizeReactions(wish.reactions)).reduce((s, n) => s + Number(n || 0), 0);
+    const t = wish.theme || "holi";
+    const visibility = wish.visibility || "public";
+    if (visibility === "public") {
+      totalPublicWishes += 1;
+      byFestival[f] = Number(byFestival[f] || 0) + 1;
+      byMood[m] = Number(byMood[m] || 0) + 1;
+      byAudience[a] = Number(byAudience[a] || 0) + 1;
+      byTheme[t] = Number(byTheme[t] || 0) + 1;
+      totalViews += Number(wish.views || 0);
+      totalReactions += wishReactionTotal(wish);
+    } else {
+      totalPrivateWishes += 1;
+    }
+    const createdTs = Date.parse(wish.createdAt || "");
+    if (Number.isFinite(createdTs)) {
+      if (!lastCreatedAt || createdTs > Date.parse(lastCreatedAt)) {
+        lastCreatedAt = new Date(createdTs).toISOString();
+      }
+      if (now - createdTs <= 24 * 60 * 60 * 1000) {
+        recentWishes24h += 1;
+      }
+    }
   }
+  const topFestival = topCountEntry(byFestival);
+  const topMood = topCountEntry(byMood);
+  const topAudience = topCountEntry(byAudience);
+  const topTheme = topCountEntry(byTheme);
   res.json({
     totalWishes: wishesStore.size,
+    totalPublicWishes,
+    totalPrivateWishes,
     totalViews,
     totalReactions,
+    recentWishes24h,
+    lastCreatedAt,
     byFestival,
     byMood,
-    byAudience
+    byAudience,
+    byTheme,
+    topFestival: topFestival.key,
+    topFestivalCount: topFestival.count,
+    topMood: topMood.key,
+    topMoodCount: topMood.count,
+    topAudience: topAudience.key,
+    topAudienceCount: topAudience.count,
+    topTheme: topTheme.key,
+    topThemeCount: topTheme.count
   });
 });
 

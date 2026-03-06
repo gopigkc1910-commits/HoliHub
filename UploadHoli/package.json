@@ -5,11 +5,17 @@
   "description": "Holi celebration page with Spotify backend search",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:browser": "node browser-smoke.mjs all",
+    "test:browser:public": "node browser-smoke.mjs public",
+    "test:browser:private": "node browser-smoke.mjs private"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
   }
 }

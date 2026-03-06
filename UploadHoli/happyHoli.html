@@ -12,6 +12,10 @@
   --bg2: #ffbe0b;
   --bg3: #00c897;
   --bg4: #219ebc;
+  --blob1: #ff9f1c;
+  --blob2: #2ec4b6;
+  --blob3: #e71d36;
+  --blob4: #8338ec;
   --card: rgba(255, 255, 255, 0.16);
   --text: #ffffff;
   --accent: #ffd166;
@@ -53,10 +57,10 @@ body {
   animation: float 11s ease-in-out infinite;
 }
 
-.bg-blobs span:nth-child(1) { width: 240px; height: 240px; top: 8%; left: 6%; background: #ff9f1c; }
-.bg-blobs span:nth-child(2) { width: 280px; height: 280px; top: 62%; left: 70%; background: #2ec4b6; animation-delay: 1.7s; }
-.bg-blobs span:nth-child(3) { width: 200px; height: 200px; top: 25%; left: 78%; background: #e71d36; animation-delay: 3.1s; }
-.bg-blobs span:nth-child(4) { width: 220px; height: 220px; top: 72%; left: 12%; background: #8338ec; animation-delay: 2.2s; }
+.bg-blobs span:nth-child(1) { width: 240px; height: 240px; top: 8%; left: 6%; background: var(--blob1); }
+.bg-blobs span:nth-child(2) { width: 280px; height: 280px; top: 62%; left: 70%; background: var(--blob2); animation-delay: 1.7s; }
+.bg-blobs span:nth-child(3) { width: 200px; height: 200px; top: 25%; left: 78%; background: var(--blob3); animation-delay: 3.1s; }
+.bg-blobs span:nth-child(4) { width: 220px; height: 220px; top: 72%; left: 12%; background: var(--blob4); animation-delay: 2.2s; }
 
 @keyframes float {
   0% { transform: translateY(0px) scale(1); }
@@ -493,6 +497,178 @@ input[type="range"] {
 #audioNative { display: none; }
 #spotifyFallbackFrame { display: none; border: 0; width: 100%; height: 152px; border-radius: 12px; margin-top: 10px; }
 
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.insight-card {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.insight-label {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+}
+
+.insight-value {
+  margin-top: 6px;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.insight-note {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.builder-assist {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.assist-card {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.assist-card h3 {
+  margin: 0 0 10px;
+  font-size: 0.96rem;
+}
+
+.assist-list {
+  display: grid;
+  gap: 8px;
+}
+
+.assist-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.assist-item strong {
+  font-size: 0.8rem;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.assist-item.done strong {
+  background: #86efac;
+  color: #0f172a;
+}
+
+.tip-box {
+  min-height: 72px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.privacy-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 10px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.status-pill.live {
+  background: #bbf7d0;
+  color: #14532d;
+}
+
+.status-pill.warn {
+  background: #fde68a;
+  color: #713f12;
+}
+
+.preset-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.preset-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.preset-main {
+  min-width: 0;
+}
+
+.preset-title {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preset-sub {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.preset-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.load-more-row {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.empty-state {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .footer-notes {
   display: grid;
   gap: 8px;
@@ -642,6 +818,81 @@ input[type="range"] {
 
 .share-row button {
   flex: 1 1 170px;
+}
+
+.action-grid {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.action-card {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.action-card h3 {
+  margin: 0 0 8px;
+  font-size: 0.96rem;
+}
+
+.button-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.qr-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  text-align: center;
+}
+
+.qr-panel img {
+  width: min(220px, 100%);
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+}
+
+.status-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 10px;
+}
+
+.status-card {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.status-card strong {
+  display: block;
+  font-size: 1rem;
+  margin-top: 6px;
+}
+
+.favorite-btn {
+  min-width: 44px;
+  padding-inline: 12px;
+}
+
+.favorite-btn.is-active {
+  background: #fef3c7;
+}
+
+.helper-line {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
 }
 
 .countdown-card {
@@ -849,6 +1100,23 @@ body.wish-mode #musicSection {
         <span class="tag" id="festivalTag">FestivalHub 2026</span>
       </div>
       <p>Create shareable mood or festival cards with music, reactions, and mobile-first sharing.</p>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-label">Build Score</div>
+          <div class="insight-value" id="completionScore">0%</div>
+          <div class="insight-note" id="completionNote">Start with recipient and message.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Community Cards</div>
+          <div class="insight-value" id="communityCount">0</div>
+          <div class="insight-note" id="communityNote">Live usage will appear here.</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Autosave</div>
+          <div class="insight-value" id="autosaveLabel">Idle</div>
+          <div class="insight-note" id="autosaveNote">Draft syncs on every edit.</div>
+        </div>
+      </div>
       <div class="choice-grid">
         <select id="categoryInput" aria-label="Card type">
           <option value="Mood">Mood Card</option>
@@ -929,6 +1197,23 @@ body.wish-mode #musicSection {
         <textarea id="messageInput" placeholder="Enter your custom message"></textarea>
       </div>
       <div class="mini-panel">
+        <div class="meta-line">Privacy and sharing</div>
+        <div class="privacy-grid">
+          <select id="visibilityInput" aria-label="Visibility">
+            <option value="public">Public: appears in recent wishes</option>
+            <option value="private">Private: only people with the link can open</option>
+          </select>
+          <input id="accessCodeInput" type="text" maxlength="32" placeholder="Optional access code for private cards">
+          <select id="expiryInput" aria-label="Link expiry">
+            <option value="0">No expiry</option>
+            <option value="1">Expire in 1 day</option>
+            <option value="7">Expire in 7 days</option>
+            <option value="30">Expire in 30 days</option>
+          </select>
+        </div>
+        <div id="privacyNote" class="meta-line" style="margin-top:8px;">Public cards appear in recent and trending feeds. Private cards stay off public lists.</div>
+      </div>
+      <div class="mini-panel">
         <div class="meta-line">Quick message styles for repeat daily use</div>
         <div class="template-grid">
           <button type="button" onclick="applyMessagePreset('sweet')">Sweet</button>
@@ -937,6 +1222,18 @@ body.wish-mode #musicSection {
           <button type="button" onclick="applyMessagePreset('short')">Short</button>
         </div>
         <div id="templateStatus" class="meta-line" style="margin-top:8px;">Target a category and audience to generate a better default message.</div>
+      </div>
+      <div class="mini-panel">
+        <div class="section-head">
+          <div>
+            <div class="meta-line">Reusable presets for faster creation</div>
+            <h2 style="margin-top:4px;">Saved Setups</h2>
+          </div>
+          <button type="button" id="savePresetBtn">Save Current Setup</button>
+        </div>
+        <div id="presetList" class="preset-list">
+          <div class="empty-state">No saved setups yet. Save one after customizing the form.</div>
+        </div>
       </div>
       <div class="controls-row" style="margin-top:10px;">
         <button class="primary" onclick="generateLink()">Generate Share Link</button>
@@ -950,6 +1247,30 @@ body.wish-mode #musicSection {
         <button onclick="shareInstagram()">Share on Instagram</button>
         <button onclick="copyShareLink()">Copy Link</button>
       </div>
+      <div class="action-grid">
+        <div class="action-card">
+          <h3>Modern Sharing</h3>
+          <div class="button-stack">
+            <button type="button" onclick="nativeShareLink()">Native Share</button>
+            <button type="button" onclick="toggleQrPanel()">Show QR Code</button>
+            <button type="button" onclick="favoriteCurrentDraft()">Save Draft Snapshot</button>
+          </div>
+          <div id="qrPanel" class="qr-panel is-hidden">
+            <img id="qrImage" alt="Share QR code">
+            <div id="qrCaption" class="helper-line">Generate a link first to create a QR code.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <h3>Portability</h3>
+          <div class="button-stack">
+            <button type="button" onclick="exportDraftJson()">Export Draft JSON</button>
+            <button type="button" onclick="triggerDraftImport()">Import Draft JSON</button>
+            <button type="button" onclick="copyBuilderSummary()">Copy Builder Summary</button>
+          </div>
+          <input id="draftImportInput" type="file" accept="application/json" class="is-hidden">
+          <div class="helper-line">Makes your setup portable across devices and browsers.</div>
+        </div>
+      </div>
       <div id="shareStatus" class="meta-line" style="margin-top:10px;">Share link not generated yet.</div>
       <div id="statsLine" class="meta-line"></div>
       <div id="dailyPrompt" class="meta-line"></div>
@@ -957,6 +1278,21 @@ body.wish-mode #musicSection {
         <h3 class="preview-title" id="previewTitle">Happy Holi, Friend!</h3>
         <p class="preview-text" id="previewMessage">Your message preview appears here.</p>
         <div class="preview-meta" id="previewMeta">From: You | Music: Not selected</div>
+      </div>
+      <div class="builder-assist">
+        <div class="assist-card">
+          <h3>Publishing Checklist</h3>
+          <div id="builderChecklist" class="assist-list">
+            <div class="assist-item"><span>Recipient name</span><strong>Todo</strong></div>
+          </div>
+        </div>
+        <div class="assist-card">
+          <h3>Smart Tip</h3>
+          <div id="smartTipBox" class="tip-box">Add a short recipient name and a direct message first. That gives the preview and generated link much better context.</div>
+          <div style="margin-top:10px;">
+            <span id="experienceBadge" class="status-pill warn">Draft mode</span>
+          </div>
+        </div>
       </div>
       <div class="countdown-card">
         <div id="countdown"></div>
@@ -970,6 +1306,7 @@ body.wish-mode #musicSection {
         <h3 class="preview-title" id="wishTitle">Happy Festival!</h3>
         <p class="preview-text" id="wishFrom">Message from Friend</p>
         <p class="preview-text" id="wishMessage">May your day be joyful.</p>
+        <div class="preview-meta" id="wishPrivacy">Visibility: Public</div>
         <div class="preview-meta" id="wishSong">Music: Not selected</div>
         <div class="preview-meta" id="wishViews">Opens: 0</div>
         <div class="preview-meta" id="wishReactions">Reactions: 0</div>
@@ -983,6 +1320,7 @@ body.wish-mode #musicSection {
       <div class="controls-row" style="margin-top:10px;">
         <button class="primary" onclick="playGreetingSong()">Play Song</button>
         <button onclick="shareCurrentGreeting()">Share This Greeting</button>
+        <button onclick="favoriteActiveGreeting()">Save to Favorites</button>
         <button onclick="remixGreeting()">Remix This Greeting</button>
         <button onclick="copyShareLink()">Copy Link</button>
       </div>
@@ -1054,7 +1392,10 @@ body.wish-mode #musicSection {
     </section>
 
     <section class="card" id="recentSection">
-      <h2>Recent Wishes</h2>
+      <div class="section-head">
+        <h2>Recent Wishes</h2>
+        <span id="recentMeta" class="status-pill">Loading recent cards...</span>
+      </div>
       <div class="recent-toolbar">
         <select id="recentFestivalFilter" aria-label="Filter by festival">
           <option value="">All Festivals</option>
@@ -1077,10 +1418,22 @@ body.wish-mode #musicSection {
           <option value="community">Community</option>
         </select>
         <input id="recentSearchInput" type="text" placeholder="Search name or message">
+        <select id="recentSortInput" aria-label="Sort recent wishes">
+          <option value="recent">Newest First</option>
+          <option value="popular">Most Popular</option>
+          <option value="views">Most Viewed</option>
+        </select>
         <button onclick="refreshRecentWishes()">Refresh</button>
       </div>
       <div id="recentWishes" class="recent-list">
         <div class="meta-line">No wishes yet. Create one to see it here.</div>
+      </div>
+      <div class="load-more-row">
+        <button id="loadMoreRecentBtn" type="button" class="is-hidden">Load More</button>
+      </div>
+      <h2 style="margin-top:14px;">Saved Favorites</h2>
+      <div id="favoriteWishes" class="recent-list">
+        <div class="meta-line">No favorites saved yet.</div>
       </div>
       <h2 style="margin-top:14px;">Trending Cards Today</h2>
       <div id="trendingWishes" class="recent-list">
@@ -1090,6 +1443,24 @@ body.wish-mode #musicSection {
       <div id="randomConfession" class="meta-line">Loading...</div>
       <div class="controls-row" style="margin-top:8px;">
         <button onclick="loadRandomConfession()">Read Random Confession 👀</button>
+      </div>
+      <h2 style="margin-top:14px;">App Pulse</h2>
+      <div class="status-grid">
+        <div class="status-card">
+          <div class="meta-line">Backend</div>
+          <strong id="healthBackend">Checking...</strong>
+          <div id="healthBackendNote" class="helper-line">API health status will appear here.</div>
+        </div>
+        <div class="status-card">
+          <div class="meta-line">Top Festival</div>
+          <strong id="healthFestival">-</strong>
+          <div id="healthFestivalNote" class="helper-line">Most created public festival cards.</div>
+        </div>
+        <div class="status-card">
+          <div class="meta-line">Top Theme</div>
+          <strong id="healthTheme">-</strong>
+          <div id="healthThemeNote" class="helper-line">Most used visual direction right now.</div>
+        </div>
       </div>
     </section>
 
@@ -1172,14 +1543,54 @@ const FESTIVAL_DATES = {
 };
 
 const THEME_MAP = {
-  holi: ["#ff4d6d", "#ffbe0b", "#00c897", "#219ebc"],
-  sunset: ["#f97316", "#fb7185", "#f59e0b", "#38bdf8"],
-  emerald: ["#064e3b", "#10b981", "#34d399", "#0f766e"],
-  royal: ["#1e1b4b", "#4c1d95", "#0284c7", "#0f172a"],
-  "neon-love": ["#f43f5e", "#fb7185", "#ec4899", "#7e22ce"],
-  "dark-romance": ["#111827", "#1f2937", "#7f1d1d", "#991b1b"],
-  "cute-pastel": ["#fbcfe8", "#fde68a", "#bfdbfe", "#bbf7d0"],
-  minimal: ["#111827", "#374151", "#6b7280", "#9ca3af"]
+  holi: {
+    bg: ["#ff4d6d", "#ffbe0b", "#00c897", "#219ebc"],
+    blobs: ["#ff9f1c", "#2ec4b6", "#e71d36", "#8338ec"],
+    accent: "#ffd166",
+    card: "rgba(255, 255, 255, 0.16)"
+  },
+  sunset: {
+    bg: ["#f97316", "#fb7185", "#f59e0b", "#38bdf8"],
+    blobs: ["#fdba74", "#fb7185", "#facc15", "#7dd3fc"],
+    accent: "#fed766",
+    card: "rgba(255, 244, 236, 0.16)"
+  },
+  emerald: {
+    bg: ["#064e3b", "#10b981", "#34d399", "#0f766e"],
+    blobs: ["#6ee7b7", "#34d399", "#99f6e4", "#14b8a6"],
+    accent: "#a7f3d0",
+    card: "rgba(236, 253, 245, 0.12)"
+  },
+  royal: {
+    bg: ["#1e1b4b", "#4c1d95", "#0284c7", "#0f172a"],
+    blobs: ["#818cf8", "#a78bfa", "#38bdf8", "#1d4ed8"],
+    accent: "#c4b5fd",
+    card: "rgba(237, 233, 254, 0.12)"
+  },
+  "neon-love": {
+    bg: ["#f43f5e", "#fb7185", "#ec4899", "#7e22ce"],
+    blobs: ["#fb7185", "#f9a8d4", "#f472b6", "#c084fc"],
+    accent: "#f9a8d4",
+    card: "rgba(255, 228, 230, 0.12)"
+  },
+  "dark-romance": {
+    bg: ["#111827", "#1f2937", "#7f1d1d", "#991b1b"],
+    blobs: ["#374151", "#7f1d1d", "#b91c1c", "#111827"],
+    accent: "#fca5a5",
+    card: "rgba(255, 255, 255, 0.09)"
+  },
+  "cute-pastel": {
+    bg: ["#fbcfe8", "#fde68a", "#bfdbfe", "#bbf7d0"],
+    blobs: ["#f9a8d4", "#fde68a", "#93c5fd", "#86efac"],
+    accent: "#fff1a8",
+    card: "rgba(255, 255, 255, 0.22)"
+  },
+  minimal: {
+    bg: ["#111827", "#374151", "#6b7280", "#9ca3af"],
+    blobs: ["#374151", "#6b7280", "#9ca3af", "#d1d5db"],
+    accent: "#e5e7eb",
+    card: "rgba(255, 255, 255, 0.12)"
+  }
 };
 
 const FESTIVAL_EMOJI = {
@@ -1254,6 +1665,10 @@ const aiToneInput = document.getElementById("aiToneInput");
 const festivalInput = document.getElementById("festivalInput");
 const audienceInput = document.getElementById("audienceInput");
 const themeInput = document.getElementById("themeInput");
+const visibilityInput = document.getElementById("visibilityInput");
+const accessCodeInput = document.getElementById("accessCodeInput");
+const expiryInput = document.getElementById("expiryInput");
+const privacyNote = document.getElementById("privacyNote");
 const festivalTag = document.getElementById("festivalTag");
 const spotifyInput = document.getElementById("spotifyInput");
 const musicStyleInput = document.getElementById("musicStyleInput");
@@ -1374,6 +1789,8 @@ const festivalFromUrl = params.get("festival") || "Holi";
 const audienceFromUrl = params.get("audience") || "friend";
 const messageFromUrl = params.get("message") || "";
 const themeFromUrl = params.get("theme") || "holi";
+const visibilityFromUrl = params.get("visibility") || "public";
+const expiryFromUrl = params.get("expiresInDays") || "0";
 const anonymousFromUrl = params.get("anonymous") === "1";
 
 if (categoryInput.querySelector(`option[value="${categoryFromUrl}"]`)) {
@@ -1391,6 +1808,12 @@ if (audienceInput.querySelector(`option[value="${audienceFromUrl}"]`)) {
 if (themeInput.querySelector(`option[value="${themeFromUrl}"]`)) {
   themeInput.value = themeFromUrl;
 }
+if (visibilityInput.querySelector(`option[value="${visibilityFromUrl}"]`)) {
+  visibilityInput.value = visibilityFromUrl;
+}
+if (expiryInput.querySelector(`option[value="${expiryFromUrl}"]`)) {
+  expiryInput.value = expiryFromUrl;
+}
 if (senderFromUrl) senderInput.value = senderFromUrl;
 if (aliasFromUrl) anonymousAliasInput.value = aliasFromUrl;
 if (nameFromUrl) nameInput.value = nameFromUrl;
@@ -1400,12 +1823,16 @@ updateFestivalUi();
 updateCategoryUi();
 applyTheme(themeInput.value);
 syncAnonymousUi();
+syncPrivacyUi();
 syncAudienceUi();
 updateTitle();
 updatePreviewCard();
 
 if (params.get("spotify")) spotifyInput.value = params.get("spotify");
 if (params.get("song")) spotifyInput.value = params.get("song");
+if (params.get("spotify") || params.get("song")) {
+  updatePreviewCard();
+}
 spotifyInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") loadSpotify();
 });
@@ -1415,6 +1842,7 @@ categoryInput.addEventListener("change", () => {
   updateTitle();
   updatePreviewCard();
   updateThoughtText();
+  renderBuilderInsights();
   refreshRecentWishes();
   refreshTrendingWishes();
   saveDraft();
@@ -1423,6 +1851,7 @@ moodInput.addEventListener("change", () => {
   updateTitle();
   updatePreviewCard();
   updateThoughtText();
+  renderBuilderInsights();
   refreshRecentWishes();
   refreshTrendingWishes();
   saveDraft();
@@ -1433,6 +1862,7 @@ festivalInput.addEventListener("change", () => {
   updateTitle();
   updatePreviewCard();
   tickCountdown();
+  renderBuilderInsights();
   refreshRecentWishes();
   refreshTrendingWishes();
   saveDraft();
@@ -1441,6 +1871,7 @@ audienceInput.addEventListener("change", () => {
   syncAudienceUi();
   updateTitle();
   updatePreviewCard();
+  renderBuilderInsights();
   refreshRecentWishes();
   refreshTrendingWishes();
   saveDraft();
@@ -1448,23 +1879,44 @@ audienceInput.addEventListener("change", () => {
 themeInput.addEventListener("change", () => {
   applyTheme(themeInput.value);
   updatePreviewCard();
+  renderBuilderInsights();
+  saveDraft();
+});
+visibilityInput.addEventListener("change", () => {
+  syncPrivacyUi();
+  updatePreviewCard();
+  renderBuilderInsights();
+  saveDraft();
+});
+accessCodeInput.addEventListener("input", () => {
+  syncPrivacyUi();
+  renderBuilderInsights();
+  saveDraft();
+});
+expiryInput.addEventListener("change", () => {
+  syncPrivacyUi();
+  renderBuilderInsights();
   saveDraft();
 });
 senderInput.addEventListener("input", () => {
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 nameInput.addEventListener("input", () => {
   updateTitle();
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 messageInput.addEventListener("input", () => {
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 spotifyInput.addEventListener("input", () => {
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 musicStyleInput.addEventListener("change", () => {
@@ -1473,21 +1925,25 @@ musicStyleInput.addEventListener("change", () => {
     spotifyInput.value = style + " songs";
   }
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 anonymousInput.addEventListener("change", () => {
   syncAnonymousUi();
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 anonymousAliasInput.addEventListener("input", () => {
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 shuffleAliasBtn.addEventListener("click", () => {
   anonymousAliasInput.value = generateAnonymousAlias();
   syncAnonymousUi();
   updatePreviewCard();
+  renderBuilderInsights();
   saveDraft();
 });
 
@@ -1513,6 +1969,20 @@ function getSenderDisplayName() {
     return ensureAnonymousAlias(false);
   }
   return senderInput.value.trim() || "You";
+}
+
+function syncPrivacyUi() {
+  const isPrivate = (visibilityInput.value || "public") === "private";
+  accessCodeInput.disabled = !isPrivate;
+  if (!isPrivate) accessCodeInput.value = "";
+  if (privacyNote) {
+    const hasCode = !!accessCodeInput.value.trim();
+    const expiryDays = Number(expiryInput.value || 0);
+    const expiryText = expiryDays > 0 ? (" It will expire in " + expiryDays + " day" + (expiryDays === 1 ? "" : "s") + ".") : "";
+    privacyNote.textContent = isPrivate
+      ? ("Private cards stay off recent/trending feeds." + (hasCode ? " Recipients must enter the access code to open it." : " Anyone with the link can open it.") + expiryText)
+      : "Public cards appear in recent and trending feeds. Anyone with the link can still open them.";
+  }
 }
 
 function syncAnonymousUi() {
@@ -1574,9 +2044,10 @@ function updatePreviewCard() {
   const msg = messageInput.value.trim() || ("Sending " + context + " vibes to you!");
   const song = spotifyInput.value.trim() || "Not selected";
   const audienceLabel = AUDIENCE_LABELS[audienceInput.value] || "friend";
+  const visibilityLabel = (visibilityInput.value || "public") === "private" ? "Private link" : "Public card";
   if (previewTitle) previewTitle.textContent = emoji + " " + context + " card for " + friend;
   if (previewMessage) previewMessage.textContent = "\"" + msg + "\"";
-  if (previewMeta) previewMeta.textContent = "From: " + sender + " | For: " + audienceLabel + " | Music: " + song + " | Theme: " + (themeInput.value || "holi");
+  if (previewMeta) previewMeta.textContent = "From: " + sender + " | For: " + audienceLabel + " | Music: " + song + " | " + visibilityLabel + " | Theme: " + resolveThemeKey(themeInput.value);
 }
 
 function syncAudienceUi() {
@@ -1616,12 +2087,29 @@ function updateThoughtText() {
   thoughtEl.textContent = "\"" + thoughts[thoughtIndex % thoughts.length] + "\"";
 }
 
+function resolveThemeKey(themeKey) {
+  if (themeKey && THEME_MAP[themeKey]) return themeKey;
+  return "holi";
+}
+
 function applyTheme(themeKey) {
-  const theme = THEME_MAP[themeKey] || THEME_MAP.holi;
-  document.documentElement.style.setProperty("--bg1", theme[0]);
-  document.documentElement.style.setProperty("--bg2", theme[1]);
-  document.documentElement.style.setProperty("--bg3", theme[2]);
-  document.documentElement.style.setProperty("--bg4", theme[3]);
+  const resolvedKey = resolveThemeKey(themeKey);
+  const theme = THEME_MAP[resolvedKey];
+  const bg = theme.bg || THEME_MAP.holi.bg;
+  const blobs = theme.blobs || THEME_MAP.holi.blobs;
+  if (themeInput && themeInput.value !== resolvedKey) {
+    themeInput.value = resolvedKey;
+  }
+  document.documentElement.style.setProperty("--bg1", bg[0]);
+  document.documentElement.style.setProperty("--bg2", bg[1]);
+  document.documentElement.style.setProperty("--bg3", bg[2]);
+  document.documentElement.style.setProperty("--bg4", bg[3]);
+  document.documentElement.style.setProperty("--blob1", blobs[0]);
+  document.documentElement.style.setProperty("--blob2", blobs[1]);
+  document.documentElement.style.setProperty("--blob3", blobs[2]);
+  document.documentElement.style.setProperty("--blob4", blobs[3]);
+  document.documentElement.style.setProperty("--accent", theme.accent || THEME_MAP.holi.accent);
+  document.documentElement.style.setProperty("--card", theme.card || THEME_MAP.holi.card);
 }
 
 function configureCreatorSection() {
@@ -1656,7 +2144,11 @@ async function copyHomeLink() {
       return;
     }
   } catch (_) {}
-  window.prompt("Copy this link", homeLink);
+  if (legacyCopyText(homeLink)) {
+    shareStatus.textContent = "Site link copied: " + homeLink;
+  } else {
+    shareStatus.textContent = "Site link ready: " + homeLink;
+  }
 }
 
 // ---------- Share link ----------
@@ -1666,8 +2158,46 @@ const recentWishesEl = document.getElementById("recentWishes");
 const recentFestivalFilter = document.getElementById("recentFestivalFilter");
 const recentAudienceFilter = document.getElementById("recentAudienceFilter");
 const recentSearchInput = document.getElementById("recentSearchInput");
-const DRAFT_KEY = "festivalhub_draft_v1";
+const recentSortInput = document.getElementById("recentSortInput");
+const recentMeta = document.getElementById("recentMeta");
+const loadMoreRecentBtn = document.getElementById("loadMoreRecentBtn");
+const favoriteWishesEl = document.getElementById("favoriteWishes");
+const completionScoreEl = document.getElementById("completionScore");
+const completionNoteEl = document.getElementById("completionNote");
+const communityCountEl = document.getElementById("communityCount");
+const communityNoteEl = document.getElementById("communityNote");
+const autosaveLabelEl = document.getElementById("autosaveLabel");
+const autosaveNoteEl = document.getElementById("autosaveNote");
+const builderChecklistEl = document.getElementById("builderChecklist");
+const smartTipBox = document.getElementById("smartTipBox");
+const experienceBadge = document.getElementById("experienceBadge");
+const savePresetBtn = document.getElementById("savePresetBtn");
+const presetList = document.getElementById("presetList");
+const qrPanel = document.getElementById("qrPanel");
+const qrImage = document.getElementById("qrImage");
+const qrCaption = document.getElementById("qrCaption");
+const draftImportInput = document.getElementById("draftImportInput");
+const healthBackendEl = document.getElementById("healthBackend");
+const healthBackendNoteEl = document.getElementById("healthBackendNote");
+const healthFestivalEl = document.getElementById("healthFestival");
+const healthFestivalNoteEl = document.getElementById("healthFestivalNote");
+const healthThemeEl = document.getElementById("healthTheme");
+const healthThemeNoteEl = document.getElementById("healthThemeNote");
+const DRAFT_KEY = "festivalhub_draft_v2";
+const LEGACY_DRAFT_KEY = "festivalhub_draft_v1";
+const PRESETS_KEY = "festivalhub_saved_presets_v1";
+const FAVORITES_KEY = "festivalhub_favorites_v1";
 const ADMIN_PIN_KEY = "festivalhub_admin_pin";
+const RECENT_PAGE_SIZE = 8;
+const recentState = { offset: 0, total: 0, hasMore: false };
+
+if (savePresetBtn) {
+  savePresetBtn.addEventListener("click", saveCurrentPreset);
+}
+renderPresetList();
+renderFavoriteWishes();
+renderBuilderInsights();
+setAutosaveState("Ready", "Draft syncs on every edit.");
 
 function sanitizeShareBase() {
   if (window.location.protocol === "file:") {
@@ -1690,7 +2220,540 @@ function buildFallbackWishLink(base, payload) {
   if (payload.message) url.searchParams.set("message", payload.message);
   if (payload.music) url.searchParams.set("song", payload.music);
   if (payload.theme) url.searchParams.set("theme", payload.theme);
+  if (payload.visibility) url.searchParams.set("visibility", payload.visibility);
+  if (payload.expiresInDays) url.searchParams.set("expiresInDays", payload.expiresInDays);
   return url.toString();
+}
+
+function getCurrentDraftData() {
+  return {
+    category: categoryInput.value || "Festival",
+    mood: moodInput.value || "Celebration",
+    aiTone: aiToneInput.value || "Romantic",
+    audience: audienceInput.value || "friend",
+    senderName: senderInput.value || "",
+    anonymousAlias: anonymousAliasInput.value || "",
+    friendName: nameInput.value || "",
+    festival: festivalInput.value || "Holi",
+    message: messageInput.value || "",
+    music: spotifyInput.value || "",
+    musicStyle: musicStyleInput.value || "",
+    visibility: visibilityInput.value || "public",
+    expiresInDays: expiryInput.value || "0",
+    anonymous: !!anonymousInput.checked,
+    theme: themeInput.value || "holi"
+  };
+}
+
+function readSavedPresets() {
+  try {
+    const raw = localStorage.getItem(PRESETS_KEY);
+    const items = JSON.parse(raw || "[]");
+    return Array.isArray(items) ? items : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function writeSavedPresets(items) {
+  try {
+    localStorage.setItem(PRESETS_KEY, JSON.stringify(items.slice(0, 6)));
+  } catch (_) {}
+}
+
+function readFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    const items = JSON.parse(raw || "[]");
+    return Array.isArray(items) ? items : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function writeFavorites(items) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(items.slice(0, 20)));
+  } catch (_) {}
+}
+
+function isFavoriteRecord(id) {
+  return readFavorites().some((item) => item && item.id === id);
+}
+
+function renderFavoriteWishes() {
+  if (!favoriteWishesEl) return;
+  const items = readFavorites();
+  if (!items.length) {
+    favoriteWishesEl.innerHTML = "<div class=\"meta-line\">No favorites saved yet.</div>";
+    return;
+  }
+  favoriteWishesEl.innerHTML = "";
+  items.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "recent-item";
+    const main = document.createElement("div");
+    main.className = "recent-main";
+    const title = document.createElement("div");
+    title.className = "recent-title";
+    title.textContent = item.title || "Saved favorite";
+    const sub = document.createElement("div");
+    sub.className = "recent-sub";
+    sub.textContent = item.subtitle || "Saved locally";
+    const date = document.createElement("div");
+    date.className = "recent-sub";
+    date.textContent = item.savedAt ? ("Saved: " + fmtShortDate(item.savedAt)) : "";
+    const actions = document.createElement("div");
+    actions.className = "recent-actions";
+    const openBtn = document.createElement("button");
+    openBtn.textContent = "Open";
+    openBtn.onclick = () => {
+      if (item.link) window.open(item.link, "_blank");
+    };
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "danger-btn";
+    removeBtn.textContent = "Remove";
+    removeBtn.onclick = () => toggleFavoriteRecord(item);
+    main.appendChild(title);
+    main.appendChild(sub);
+    main.appendChild(date);
+    actions.appendChild(openBtn);
+    actions.appendChild(removeBtn);
+    row.appendChild(main);
+    row.appendChild(actions);
+    favoriteWishesEl.appendChild(row);
+  });
+}
+
+function toggleFavoriteRecord(record) {
+  if (!record || !record.id) return;
+  const items = readFavorites();
+  const exists = items.some((item) => item.id === record.id);
+  const next = exists
+    ? items.filter((item) => item.id !== record.id)
+    : [{ ...record, savedAt: new Date().toISOString() }, ...items];
+  writeFavorites(next);
+  renderFavoriteWishes();
+  refreshRecentWishes();
+  shareStatus.textContent = exists ? "Removed from favorites." : "Saved to favorites.";
+}
+
+function favoriteLabel(id) {
+  return isFavoriteRecord(id) ? "★" : "☆";
+}
+
+function buildFavoriteRecord(data) {
+  if (!data || !data.id) return null;
+  const context = data.category === "Mood" ? (data.mood || "Mood") : (data.festival || "Festival");
+  const title = context + (data.friendName ? " for " + data.friendName : "");
+  const reacts = Object.values(data.reactions || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+  const subtitle = "Audience: " + (AUDIENCE_LABELS[data.audience] || "friend") + " | Opens: " + Number(data.views || 0) + " | Reactions: " + reacts;
+  return {
+    id: data.id,
+    title,
+    subtitle,
+    link: publicWishLink(data.id),
+    savedAt: new Date().toISOString()
+  };
+}
+
+function renderPresetList() {
+  if (!presetList) return;
+  const items = readSavedPresets();
+  if (!items.length) {
+    presetList.innerHTML = "<div class=\"empty-state\">No saved setups yet. Save one after customizing the form.</div>";
+    return;
+  }
+  presetList.innerHTML = "";
+  items.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "preset-item";
+    const main = document.createElement("div");
+    main.className = "preset-main";
+    const title = document.createElement("div");
+    title.className = "preset-title";
+    title.textContent = item.label || "Saved Setup";
+    const sub = document.createElement("div");
+    sub.className = "preset-sub";
+    const context = item.category === "Mood" ? (item.mood || "Mood") : (item.festival || "Festival");
+    sub.textContent = context + " | " + (AUDIENCE_LABELS[item.audience] || "friend") + " | " + (item.visibility === "private" ? "Private" : "Public") + " | Theme: " + (item.theme || "holi");
+    const actions = document.createElement("div");
+    actions.className = "preset-actions";
+    const applyBtn = document.createElement("button");
+    applyBtn.type = "button";
+    applyBtn.textContent = "Apply";
+    applyBtn.onclick = () => applySavedPreset(item.id);
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "danger-btn";
+    removeBtn.textContent = "Delete";
+    removeBtn.onclick = () => deleteSavedPreset(item.id);
+    main.appendChild(title);
+    main.appendChild(sub);
+    actions.appendChild(applyBtn);
+    actions.appendChild(removeBtn);
+    row.appendChild(main);
+    row.appendChild(actions);
+    presetList.appendChild(row);
+  });
+}
+
+function applySavedPreset(id) {
+  const preset = readSavedPresets().find((item) => item.id === id);
+  if (!preset) return;
+  if (preset.category && categoryInput.querySelector(`option[value="${preset.category}"]`)) categoryInput.value = preset.category;
+  if (preset.mood && moodInput.querySelector(`option[value="${preset.mood}"]`)) moodInput.value = preset.mood;
+  if (preset.aiTone && aiToneInput.querySelector(`option[value="${preset.aiTone}"]`)) aiToneInput.value = preset.aiTone;
+  if (preset.audience && audienceInput.querySelector(`option[value="${preset.audience}"]`)) audienceInput.value = preset.audience;
+  if (preset.festival && festivalInput.querySelector(`option[value="${preset.festival}"]`)) festivalInput.value = preset.festival;
+  if (preset.theme && themeInput.querySelector(`option[value="${preset.theme}"]`)) themeInput.value = preset.theme;
+  else themeInput.value = "holi";
+  if (preset.visibility && visibilityInput.querySelector(`option[value="${preset.visibility}"]`)) visibilityInput.value = preset.visibility;
+  if (preset.expiresInDays && expiryInput.querySelector(`option[value="${preset.expiresInDays}"]`)) expiryInput.value = preset.expiresInDays;
+  senderInput.value = preset.senderName || "";
+  anonymousAliasInput.value = preset.anonymousAlias || "";
+  nameInput.value = preset.friendName || "";
+  messageInput.value = preset.message || "";
+  spotifyInput.value = preset.music || "";
+  musicStyleInput.value = preset.musicStyle || "";
+  anonymousInput.checked = !!preset.anonymous;
+  applyTheme(themeInput.value);
+  syncAnonymousUi();
+  syncPrivacyUi();
+  syncAudienceUi();
+  updateFestivalUi();
+  updateCategoryUi();
+  updateTitle();
+  updatePreviewCard();
+  updateThoughtText();
+  tickCountdown();
+  renderBuilderInsights();
+  saveDraft();
+  shareStatus.textContent = "Saved setup applied.";
+}
+
+function deleteSavedPreset(id) {
+  const next = readSavedPresets().filter((item) => item.id !== id);
+  writeSavedPresets(next);
+  renderPresetList();
+}
+
+function saveCurrentPreset() {
+  const labelBase = window.prompt("Name this setup", (nameInput.value.trim() || festivalInput.value || moodInput.value || "My Setup"));
+  const label = String(labelBase || "").trim();
+  if (!label) return;
+  const existing = readSavedPresets();
+  const next = [{
+    id: Math.random().toString(36).slice(2, 10),
+    label,
+    ...getCurrentDraftData()
+  }, ...existing].slice(0, 6);
+  writeSavedPresets(next);
+  renderPresetList();
+  shareStatus.textContent = "Setup saved locally for faster reuse.";
+}
+
+function setAutosaveState(label, note) {
+  if (autosaveLabelEl) autosaveLabelEl.textContent = label;
+  if (autosaveNoteEl) autosaveNoteEl.textContent = note;
+}
+
+function legacyCopyText(text) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    ta.style.pointerEvents = "none";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return !!ok;
+  } catch (_) {
+    return false;
+  }
+}
+
+function getShareableLink() {
+  if (generatedShareLink) return generatedShareLink;
+  if (activeWishId) return publicWishLink(activeWishId);
+  return "";
+}
+
+function updateQrPanel() {
+  if (!qrImage || !qrCaption) return;
+  const link = getShareableLink();
+  if (!link) {
+    qrImage.removeAttribute("src");
+    qrCaption.textContent = "Generate a link first to create a QR code.";
+    return;
+  }
+  qrImage.src = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(link);
+  qrCaption.textContent = link;
+}
+
+function toggleQrPanel() {
+  if (!qrPanel) return;
+  updateQrPanel();
+  qrPanel.classList.toggle("is-hidden");
+}
+
+async function nativeShareLink() {
+  const link = getShareableLink();
+  if (!link) {
+    shareStatus.textContent = "Generate or open a greeting first.";
+    return;
+  }
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: previewTitle ? previewTitle.textContent : "FestivalHub card",
+        text: previewMessage ? previewMessage.textContent.replace(/^"|"$/g, "") : "Check this greeting",
+        url: link
+      });
+      shareStatus.textContent = "Native share opened.";
+      return;
+    } catch (_) {}
+  }
+  await copyShareLink();
+}
+
+function exportDraftJson() {
+  try {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      app: "FestivalHub",
+      draft: getCurrentDraftData()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "festivalhub-draft.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    shareStatus.textContent = "Draft exported as JSON.";
+  } catch (_) {
+    shareStatus.textContent = "Draft export failed.";
+  }
+}
+
+function triggerDraftImport() {
+  if (draftImportInput) draftImportInput.click();
+}
+
+function applyImportedDraft(draft) {
+  if (!draft || typeof draft !== "object") return;
+  if (draft.senderName != null) senderInput.value = String(draft.senderName || "");
+  if (draft.anonymousAlias != null) anonymousAliasInput.value = String(draft.anonymousAlias || "");
+  if (draft.friendName != null) nameInput.value = String(draft.friendName || "");
+  if (draft.message != null) messageInput.value = String(draft.message || "");
+  if (draft.music != null) spotifyInput.value = String(draft.music || "");
+  if (draft.musicStyle && musicStyleInput.querySelector(`option[value="${draft.musicStyle}"]`)) musicStyleInput.value = draft.musicStyle;
+  if (draft.visibility && visibilityInput.querySelector(`option[value="${draft.visibility}"]`)) visibilityInput.value = draft.visibility;
+  if (draft.expiresInDays && expiryInput.querySelector(`option[value="${draft.expiresInDays}"]`)) expiryInput.value = draft.expiresInDays;
+  if (draft.category && categoryInput.querySelector(`option[value="${draft.category}"]`)) categoryInput.value = draft.category;
+  if (draft.mood && moodInput.querySelector(`option[value="${draft.mood}"]`)) moodInput.value = draft.mood;
+  if (draft.aiTone && aiToneInput.querySelector(`option[value="${draft.aiTone}"]`)) aiToneInput.value = draft.aiTone;
+  if (draft.audience && audienceInput.querySelector(`option[value="${draft.audience}"]`)) audienceInput.value = draft.audience;
+  if (draft.festival && festivalInput.querySelector(`option[value="${draft.festival}"]`)) festivalInput.value = draft.festival;
+  themeInput.value = resolveThemeKey(draft.theme);
+  anonymousInput.checked = !!draft.anonymous;
+  applyTheme(themeInput.value);
+  syncAnonymousUi();
+  syncPrivacyUi();
+  syncAudienceUi();
+  updateFestivalUi();
+  updateCategoryUi();
+  updateTitle();
+  updatePreviewCard();
+  updateThoughtText();
+  tickCountdown();
+  renderBuilderInsights();
+  saveDraft();
+}
+
+function copyBuilderSummary() {
+  const lines = [
+    "Recipient: " + (nameInput.value.trim() || "Not set"),
+    "Sender: " + (getSenderDisplayName() || "Not set"),
+    "Category: " + (categoryInput.value || "Festival"),
+    "Context: " + (categoryInput.value === "Mood" ? (moodInput.value || "Celebration") : (festivalInput.value || "Holi")),
+    "Audience: " + (AUDIENCE_LABELS[audienceInput.value] || "friend"),
+    "Theme: " + resolveThemeKey(themeInput.value),
+    "Visibility: " + (visibilityInput.value || "public"),
+    "Music: " + (spotifyInput.value.trim() || "Not selected"),
+    "Message: " + (messageInput.value.trim() || "Not written")
+  ];
+  const text = lines.join("\n");
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      shareStatus.textContent = "Builder summary copied.";
+    }).catch(() => {
+      if (legacyCopyText(text)) {
+        shareStatus.textContent = "Builder summary copied.";
+      } else {
+        shareStatus.textContent = "Builder summary ready to copy.";
+      }
+    });
+    return;
+  }
+  if (legacyCopyText(text)) {
+    shareStatus.textContent = "Builder summary copied.";
+    return;
+  }
+  shareStatus.textContent = "Builder summary ready to copy.";
+}
+
+function favoriteCurrentDraft() {
+  const context = categoryInput.value === "Mood" ? (moodInput.value || "Mood") : (festivalInput.value || "Festival");
+  const stableId = "draft:" + [context, nameInput.value.trim(), audienceInput.value, resolveThemeKey(themeInput.value), visibilityInput.value].join("|");
+  const draftRecord = {
+    id: stableId,
+    title: context + " draft" + (nameInput.value.trim() ? " for " + nameInput.value.trim() : ""),
+    subtitle: "Local draft snapshot | Theme: " + resolveThemeKey(themeInput.value) + " | Visibility: " + (visibilityInput.value || "public"),
+    link: window.location.href.split("#")[0]
+  };
+  toggleFavoriteRecord(draftRecord);
+}
+
+function favoriteActiveGreeting() {
+  if (!activeWishId) {
+    shareStatus.textContent = "Open a greeting first to favorite it.";
+    return;
+  }
+  const record = buildFavoriteRecord({
+    id: activeWishId,
+    category: categoryInput.value,
+    mood: moodInput.value,
+    festival: festivalInput.value,
+    friendName: nameInput.value,
+    audience: audienceInput.value,
+    views: 0,
+    reactions: {}
+  });
+  toggleFavoriteRecord(record);
+}
+
+async function refreshHealthPulse() {
+  try {
+    const endpoint = new URL("/api/health", activeApiBase);
+    const res = await fetch(endpoint.toString());
+    if (!res.ok) throw new Error("health_failed");
+    const data = await res.json();
+    if (healthBackendEl) healthBackendEl.textContent = data.ok ? "Online" : "Degraded";
+    if (healthBackendNoteEl) healthBackendNoteEl.textContent = "Service: " + (data.service || "holihub") + " | " + fmtShortDate(data.now);
+  } catch (_) {
+    if (healthBackendEl) healthBackendEl.textContent = "Offline";
+    if (healthBackendNoteEl) healthBackendNoteEl.textContent = "Could not reach backend from this browser.";
+  }
+}
+
+function renderBuilderInsights() {
+  const audioEl = document.getElementById("audioNative");
+  const hasLocalAudio = !!(audioEl && audioEl.src);
+  const isPrivate = visibilityInput.value === "private";
+  const checks = [
+    { label: "Recipient name", done: !!nameInput.value.trim() },
+    { label: "Message added", done: !!messageInput.value.trim() },
+    { label: "Sender or alias", done: anonymousInput.checked ? !!ensureAnonymousAlias(false) : !!senderInput.value.trim() },
+    { label: "Theme selected", done: !!themeInput.value.trim() },
+    { label: "Music attached", done: !!spotifyInput.value.trim() || !!hasLocalAudio },
+    { label: "Privacy reviewed", done: visibilityInput.value === "public" || !accessCodeInput.disabled },
+    { label: "Private security", done: !isPrivate || !accessCodeInput.value.trim() || accessCodeInput.value.trim().length >= 4 }
+  ];
+  const completed = checks.filter((item) => item.done).length;
+  const score = Math.round((completed / checks.length) * 100);
+  if (completionScoreEl) completionScoreEl.textContent = score + "%";
+  if (completionNoteEl) {
+    completionNoteEl.textContent = score >= 80
+      ? "Share-ready card with strong context."
+      : "Complete " + (checks.length - completed) + " more step" + (checks.length - completed === 1 ? "" : "s") + ".";
+  }
+  if (builderChecklistEl) {
+    builderChecklistEl.innerHTML = "";
+    checks.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "assist-item" + (item.done ? " done" : "");
+      row.innerHTML = "<span>" + item.label + "</span><strong>" + (item.done ? "Done" : "Todo") + "</strong>";
+      builderChecklistEl.appendChild(row);
+    });
+  }
+  if (smartTipBox) {
+    const category = categoryInput.value || "Festival";
+    const context = category === "Mood" ? (moodInput.value || "Celebration") : (festivalInput.value || "Holi");
+    const audience = AUDIENCE_LABELS[audienceInput.value] || "friend";
+    if (!nameInput.value.trim()) {
+      smartTipBox.textContent = "Add the recipient name first. Cards feel much more personal when the preview and share link are targeted.";
+    } else if (!messageInput.value.trim()) {
+      smartTipBox.textContent = "Write one direct sentence for your " + audience + ". Short, specific lines feel better than generic greetings.";
+    } else if (!spotifyInput.value.trim()) {
+      smartTipBox.textContent = "Add a song or music query to make this " + context + " card feel complete and more shareable.";
+    } else if (visibilityInput.value === "private" && accessCodeInput.value.trim() && accessCodeInput.value.trim().length < 4) {
+      smartTipBox.textContent = "Use an access code with at least 4 characters so the private link is actually protected.";
+    } else if (visibilityInput.value === "private") {
+      smartTipBox.textContent = "This private " + context + " card will stay off public feeds. Share the link carefully" + (accessCodeInput.value.trim() ? " and send the access code separately." : ".");
+    } else {
+      smartTipBox.textContent = "This " + context + " card is in strong shape. Generate a link now, then save the setup if you will reuse this style.";
+    }
+  }
+  if (experienceBadge) {
+    experienceBadge.textContent = score >= 80 ? "Ready to publish" : "Draft mode";
+    experienceBadge.className = "status-pill " + (score >= 80 ? "live" : "warn");
+  }
+}
+
+function validateWishInputs() {
+  if (!nameInput.value.trim()) {
+    shareStatus.textContent = "Add the recipient name before generating a link.";
+    nameInput.focus();
+    return false;
+  }
+  if (!messageInput.value.trim()) {
+    shareStatus.textContent = "Write a message before generating a link.";
+    messageInput.focus();
+    return false;
+  }
+  if (!anonymousInput.checked && !senderInput.value.trim()) {
+    shareStatus.textContent = "Add your name or enable anonymous mode.";
+    senderInput.focus();
+    return false;
+  }
+  if ((visibilityInput.value || "public") === "private" && accessCodeInput.value.trim() && accessCodeInput.value.trim().length < 4) {
+    shareStatus.textContent = "Private access code must be at least 4 characters.";
+    accessCodeInput.focus();
+    return false;
+  }
+  return true;
+}
+
+function updateRecentMeta(total, loaded, hasMore) {
+  if (!recentMeta) return;
+  recentMeta.textContent = loaded ? ("Showing " + loaded + " of " + total) : "No cards yet";
+  recentMeta.className = "status-pill" + (hasMore ? " warn" : "");
+}
+
+function wishCodeSessionKey(id) {
+  return "festivalhub_wish_code_" + id;
+}
+
+function getStoredWishCode(id) {
+  try {
+    return sessionStorage.getItem(wishCodeSessionKey(id)) || "";
+  } catch (_) {
+    return "";
+  }
+}
+
+function setStoredWishCode(id, code) {
+  try {
+    if (!id) return;
+    if (!code) sessionStorage.removeItem(wishCodeSessionKey(id));
+    else sessionStorage.setItem(wishCodeSessionKey(id), code);
+  } catch (_) {}
 }
 
 function renderWishGreeting(data) {
@@ -1705,17 +2768,23 @@ function renderWishGreeting(data) {
   if (data.audience && audienceInput.querySelector(`option[value="${data.audience}"]`)) {
     audienceInput.value = data.audience;
   }
+  if (data.visibility && visibilityInput.querySelector(`option[value="${data.visibility}"]`)) {
+    visibilityInput.value = data.visibility;
+  } else {
+    visibilityInput.value = "public";
+  }
   senderInput.value = data.senderName || "";
   anonymousInput.checked = !!data.anonymous;
   anonymousAliasInput.value = data.anonymousAlias || data.senderDisplayName || "";
   nameInput.value = data.friendName || "";
   messageInput.value = data.message || "";
   spotifyInput.value = data.music || "";
-  if (data.theme && themeInput.querySelector(`option[value="${data.theme}"]`)) {
-    themeInput.value = data.theme;
-    applyTheme(themeInput.value);
-  }
+  accessCodeInput.value = "";
+  expiryInput.value = "0";
+  themeInput.value = resolveThemeKey(data.theme);
+  applyTheme(themeInput.value);
   syncAnonymousUi();
+  syncPrivacyUi();
   syncAudienceUi();
   updateFestivalUi();
   updateCategoryUi();
@@ -1725,6 +2794,7 @@ function renderWishGreeting(data) {
   const wishTitle = document.getElementById("wishTitle");
   const wishFrom = document.getElementById("wishFrom");
   const wishMessage = document.getElementById("wishMessage");
+  const wishPrivacy = document.getElementById("wishPrivacy");
   const wishSong = document.getElementById("wishSong");
   const wishViews = document.getElementById("wishViews");
   const wishReactions = document.getElementById("wishReactions");
@@ -1736,16 +2806,22 @@ function renderWishGreeting(data) {
   const views = Number(data.views || 0);
   const viewsLabel = views === 1 ? "person" : "people";
   const reactionTotal = Object.values(data.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
+  const privacyBits = [];
+  privacyBits.push((data.visibility || "public") === "private" ? "Private link" : "Public card");
+  if (data.accessCodeRequired) privacyBits.push("Access code required");
+  if (data.expiresAt) privacyBits.push("Expires: " + fmtShortDate(data.expiresAt));
   if (wishOpenTitle) wishOpenTitle.textContent = contextWord + " Greeting";
   if (wishTitle) wishTitle.textContent = emoji + " " + contextWord + " card for " + (data.friendName || "Friend");
   if (wishFrom) wishFrom.textContent = "Message from " + senderDisplay;
   if (wishMessage) wishMessage.textContent = "\"" + (data.message || "Wishing you joy and happiness.") + "\"";
+  if (wishPrivacy) wishPrivacy.textContent = "Privacy: " + privacyBits.join(" | ");
   if (wishSong) wishSong.textContent = "For: " + audienceLabel + " | Music: " + (data.music || "Not selected");
   if (wishViews) wishViews.textContent = "👀 " + views + " " + viewsLabel + " viewed this greeting";
   if (wishReactions) wishReactions.textContent = "Reactions: " + reactionTotal;
 }
 
 async function generateLink() {
+  if (!validateWishInputs()) return;
   const base = sanitizeShareBase();
   if (!base) {
     shareStatus.textContent = "Set DEPLOY_BASE_URL after deploying to generate phone-safe links.";
@@ -1761,11 +2837,17 @@ async function generateLink() {
   const selectedName = nameInput.value.trim();
   const contextWord = selectedCategory === "Mood" ? selectedMood : selectedFestival;
   const selectedMessage = messageInput.value.trim() || ("Sending " + contextWord + " vibes" + (selectedName ? ", " + selectedName : "") + "!");
+  const selectedVisibility = visibilityInput.value || "public";
+  const selectedAccessCode = accessCodeInput.value.trim();
+  const selectedExpiresInDays = expiryInput.value || "0";
   const payload = {
     category: selectedCategory,
     mood: selectedMood,
     festival: selectedFestival,
     audience: selectedAudience,
+    visibility: selectedVisibility,
+    accessCode: selectedAccessCode,
+    expiresInDays: selectedExpiresInDays,
     senderName: selectedSender,
     anonymous: !!anonymousInput.checked,
     anonymousAlias: selectedAlias,
@@ -1789,10 +2871,17 @@ async function generateLink() {
     const finalBase = normalizeBase(base);
     generatedShareLink = finalBase + "/wish/" + data.id;
   } catch (_) {
+    if (selectedVisibility === "private" || selectedAccessCode || Number(selectedExpiresInDays || 0) > 0) {
+      shareStatus.textContent = "Private/security options need the backend. The secure link was not created.";
+      return;
+    }
     generatedShareLink = buildFallbackWishLink(base, payload);
   }
 
-  shareStatus.textContent = "Share link ready: " + generatedShareLink;
+  shareStatus.textContent = selectedVisibility === "private"
+    ? ("Private link ready: " + generatedShareLink + (selectedAccessCode ? " | Share the access code separately." : ""))
+    : ("Share link ready: " + generatedShareLink);
+  updateQrPanel();
   await copyShareLink();
   refreshStats();
   refreshRecentWishes();
@@ -1806,11 +2895,17 @@ async function copyShareLink() {
   if (navigator.clipboard && window.isSecureContext) {
     try {
       await navigator.clipboard.writeText(generatedShareLink);
-      shareStatus.textContent = "Link copied: " + generatedShareLink;
+      shareStatus.textContent = (visibilityInput.value === "private" ? "Private link copied" : "Link copied") + ": " + generatedShareLink + (accessCodeInput.value.trim() ? " | Share the access code separately." : "");
+      updateQrPanel();
       return;
     } catch (_) {}
   }
-  window.prompt("Copy this link", generatedShareLink);
+  if (legacyCopyText(generatedShareLink)) {
+    shareStatus.textContent = (visibilityInput.value === "private" ? "Private link copied" : "Link copied") + ": " + generatedShareLink + (accessCodeInput.value.trim() ? " | Share the access code separately." : "");
+    updateQrPanel();
+    return;
+  }
+  shareStatus.textContent = "Share link ready: " + generatedShareLink;
 }
 
 async function shareWhatsapp() {
@@ -1832,14 +2927,32 @@ async function loadWishByPathIfNeeded() {
   const match = window.location.pathname.match(/\/wish\/([a-zA-Z0-9_-]+)/);
   if (!match) return;
   const id = match[1];
+  const queryAccess = params.get("access") || "";
+  if (queryAccess && !getStoredWishCode(id)) setStoredWishCode(id, queryAccess);
+  let accessCode = getStoredWishCode(id) || queryAccess;
   try {
     const endpoint = new URL("/api/wishes/" + encodeURIComponent(id), activeApiBase);
+    if (accessCode) endpoint.searchParams.set("access", accessCode);
     const res = await fetch(endpoint.toString());
+    if (res.status === 403) {
+      const denied = await res.json().catch(() => ({}));
+      const prompted = window.prompt(denied.message || "This greeting requires an access code.");
+      if (!prompted) return;
+      accessCode = prompted.trim();
+      if (!accessCode) return;
+      setStoredWishCode(id, accessCode);
+      return loadWishByPathIfNeeded();
+    }
+    if (res.status === 410) {
+      shareStatus.textContent = "This greeting has expired and can no longer be opened.";
+      return;
+    }
     if (!res.ok) return;
     const data = await res.json();
     activeWishId = id;
     generatedShareLink = window.location.origin + "/wish/" + id;
     renderWishGreeting(data);
+    updateQrPanel();
     colorSplashAnimation();
     fireworks();
   } catch (_) {}
@@ -1854,6 +2967,9 @@ function loadWishFromQueryIfNeeded() {
     mood: moodInput.value || "Celebration",
     festival: festivalInput.value || "Holi",
     audience: audienceInput.value || "friend",
+    visibility: visibilityInput.value || "public",
+    accessCodeRequired: !!accessCodeInput.value.trim(),
+    expiresAt: Number(expiryInput.value || 0) > 0 ? new Date(Date.now() + Number(expiryInput.value || 0) * 24 * 60 * 60 * 1000).toISOString() : "",
     senderName: anonymousInput.checked ? "" : senderInput.value.trim(),
     senderDisplayName: anonymousInput.checked ? ensureAnonymousAlias(false) : (senderInput.value.trim() || "Friend"),
     anonymous: !!anonymousInput.checked,
@@ -1890,6 +3006,8 @@ function remixGreeting() {
   if (messageInput.value.trim()) url.searchParams.set("message", messageInput.value.trim());
   if (spotifyInput.value.trim()) url.searchParams.set("song", spotifyInput.value.trim());
   if (themeInput.value.trim()) url.searchParams.set("theme", themeInput.value.trim());
+  if (visibilityInput.value.trim()) url.searchParams.set("visibility", visibilityInput.value.trim());
+  if (expiryInput.value.trim()) url.searchParams.set("expiresInDays", expiryInput.value.trim());
   window.location.href = url.toString();
 }
 
@@ -1898,9 +3016,9 @@ function shareCurrentGreeting() {
     shareStatus.textContent = "Open a greeting first to share it.";
     return;
   }
-  const link = publicWishLink(activeWishId) || (window.location.origin + "/wish/" + activeWishId);
-  const text = encodeURIComponent("Check this festival greeting: " + link);
-  window.open("https://wa.me/?text=" + text, "_blank");
+  generatedShareLink = publicWishLink(activeWishId) || (window.location.origin + "/wish/" + activeWishId);
+  updateQrPanel();
+  nativeShareLink();
 }
 
 async function refreshStats() {
@@ -1912,7 +3030,16 @@ async function refreshStats() {
     const byAudience = data.byAudience || {};
     const topAudience = Object.keys(byAudience).sort((a, b) => Number(byAudience[b] || 0) - Number(byAudience[a] || 0))[0] || "";
     const audienceText = topAudience ? (" | Top audience: " + (AUDIENCE_LABELS[topAudience] || topAudience)) : "";
-    statsLine.textContent = "Total wishes: " + Number(data.totalWishes || 0) + " | Total opens: " + Number(data.totalViews || 0) + " | Reactions: " + Number(data.totalReactions || 0) + audienceText;
+    statsLine.textContent = "Public wishes: " + Number(data.totalPublicWishes || 0) + " | Private wishes: " + Number(data.totalPrivateWishes || 0) + " | Total opens: " + Number(data.totalViews || 0) + " | Reactions: " + Number(data.totalReactions || 0) + audienceText;
+    if (communityCountEl) communityCountEl.textContent = String(Number(data.totalPublicWishes || 0));
+    if (communityNoteEl) {
+      const lastCreated = data.lastCreatedAt ? ("Latest card: " + fmtShortDate(data.lastCreatedAt)) : "No cards published yet.";
+      communityNoteEl.textContent = Number(data.recentWishes24h || 0) + " created in the last 24h. " + lastCreated;
+    }
+    if (healthFestivalEl) healthFestivalEl.textContent = data.topFestival || "-";
+    if (healthFestivalNoteEl) healthFestivalNoteEl.textContent = data.topFestivalCount ? (data.topFestivalCount + " public cards created in this category.") : "No public festival card data yet.";
+    if (healthThemeEl) healthThemeEl.textContent = data.topTheme || "-";
+    if (healthThemeNoteEl) healthThemeNoteEl.textContent = data.topThemeCount ? (data.topThemeCount + " public cards using this theme.") : "No theme trend available yet.";
   } catch (_) {}
 }
 
@@ -1923,9 +3050,13 @@ async function reactToWish(reaction) {
   }
   try {
     const endpoint = new URL("/api/wishes/" + encodeURIComponent(activeWishId) + "/reactions", activeApiBase);
+    const storedCode = getStoredWishCode(activeWishId);
     const res = await fetch(endpoint.toString(), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(storedCode ? { "X-Wish-Code": storedCode } : {})
+      },
       body: JSON.stringify({ reaction })
     });
     if (!res.ok) {
@@ -1961,16 +3092,21 @@ function renderTrending(items) {
     const openBtn = document.createElement("button");
     const context = item.category === "Mood" ? (item.mood || "Mood") : (item.festival || "Festival");
     const reacts = Object.values(item.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
+    const favoriteBtn = document.createElement("button");
     title.textContent = context + (item.friendName ? " for " + item.friendName : "");
     sub.textContent = "Audience: " + (AUDIENCE_LABELS[item.audience] || "friend") + " | Views: " + Number(item.views || 0) + " | Reactions: " + reacts;
     openBtn.textContent = "Open";
+    favoriteBtn.className = "favorite-btn" + (isFavoriteRecord(item.id) ? " is-active" : "");
+    favoriteBtn.textContent = favoriteLabel(item.id);
     openBtn.onclick = () => {
       const link = publicWishLink(item.id);
       if (link) window.open(link, "_blank");
     };
+    favoriteBtn.onclick = () => toggleFavoriteRecord(buildFavoriteRecord(item));
     main.appendChild(title);
     main.appendChild(sub);
     row.appendChild(main);
+    row.appendChild(favoriteBtn);
     row.appendChild(openBtn);
     trendingWishesEl.appendChild(row);
   });
@@ -1981,6 +3117,12 @@ async function refreshTrendingWishes() {
     const endpoint = new URL("/api/wishes/trending", activeApiBase);
     endpoint.searchParams.set("limit", "6");
     endpoint.searchParams.set("audience", audienceInput.value || "friend");
+    endpoint.searchParams.set("category", categoryInput.value || "Festival");
+    if (categoryInput.value === "Mood" && moodInput.value) {
+      endpoint.searchParams.set("mood", moodInput.value);
+    } else if (festivalInput.value) {
+      endpoint.searchParams.set("festival", festivalInput.value);
+    }
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
@@ -2035,13 +3177,13 @@ function fmtShortDate(iso) {
   return d.toLocaleString();
 }
 
-function renderRecentWishes(items) {
+function renderRecentWishes(items, appendMode) {
   if (!recentWishesEl) return;
-  if (!items || !items.length) {
+  if (!appendMode && (!items || !items.length)) {
     recentWishesEl.innerHTML = "<div class=\"meta-line\">No wishes yet. Create one to see it here.</div>";
     return;
   }
-  recentWishesEl.innerHTML = "";
+  if (!appendMode) recentWishesEl.innerHTML = "";
   items.forEach((item) => {
     const row = document.createElement("div");
     row.className = "recent-item";
@@ -2066,10 +3208,25 @@ function renderRecentWishes(items) {
     copyBtn.dataset.id = item.id;
     copyBtn.textContent = "Copy";
     const deleteBtn = document.createElement("button");
+    const favoriteBtn = document.createElement("button");
     deleteBtn.dataset.action = "delete";
     deleteBtn.dataset.id = item.id;
     deleteBtn.textContent = "Delete";
     deleteBtn.className = "danger-btn";
+    favoriteBtn.dataset.action = "favorite";
+    favoriteBtn.dataset.id = item.id;
+    favoriteBtn.dataset.category = item.category || "";
+    favoriteBtn.dataset.mood = item.mood || "";
+    favoriteBtn.dataset.festival = item.festival || "";
+    favoriteBtn.dataset.friendName = item.friendName || "";
+    favoriteBtn.dataset.audience = item.audience || "";
+    favoriteBtn.dataset.views = String(Number(item.views || 0));
+    favoriteBtn.dataset.reactLove = String(Number(item.reactions?.love || 0));
+    favoriteBtn.dataset.reactFunny = String(Number(item.reactions?.funny || 0));
+    favoriteBtn.dataset.reactEmotional = String(Number(item.reactions?.emotional || 0));
+    favoriteBtn.dataset.reactRomantic = String(Number(item.reactions?.romantic || 0));
+    favoriteBtn.className = "favorite-btn" + (isFavoriteRecord(item.id) ? " is-active" : "");
+    favoriteBtn.textContent = favoriteLabel(item.id);
 
     const context = item.category === "Mood" ? (item.mood || "Mood") : (item.festival || "Festival");
     const title = context + (item.friendName ? (" for " + item.friendName) : "");
@@ -2082,6 +3239,7 @@ function renderRecentWishes(items) {
 
     actions.appendChild(openBtn);
     actions.appendChild(copyBtn);
+    actions.appendChild(favoriteBtn);
     actions.appendChild(deleteBtn);
     main.appendChild(titleElx);
     main.appendChild(subMsg);
@@ -2094,9 +3252,15 @@ function renderRecentWishes(items) {
 }
 
 async function refreshRecentWishes() {
+  await refreshRecentWishesPage(true);
+}
+
+async function refreshRecentWishesPage(resetList) {
   try {
     const endpoint = new URL("/api/wishes", activeApiBase);
-    endpoint.searchParams.set("limit", "8");
+    const nextOffset = resetList ? 0 : recentState.offset;
+    endpoint.searchParams.set("limit", String(RECENT_PAGE_SIZE));
+    endpoint.searchParams.set("offset", String(nextOffset));
     if (recentFestivalFilter && recentFestivalFilter.value) {
       endpoint.searchParams.set("festival", recentFestivalFilter.value);
     }
@@ -2109,10 +3273,18 @@ async function refreshRecentWishes() {
     }
     const q = (recentSearchInput && recentSearchInput.value || "").trim();
     if (q) endpoint.searchParams.set("q", q);
+    if (recentSortInput && recentSortInput.value) {
+      endpoint.searchParams.set("sort", recentSortInput.value);
+    }
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
-    renderRecentWishes(data.items || []);
+    renderRecentWishes(data.items || [], !resetList);
+    recentState.offset = Number(data.offset || 0) + Number((data.items || []).length);
+    recentState.total = Number(data.total || 0);
+    recentState.hasMore = !!data.hasMore;
+    updateRecentMeta(recentState.total, Math.min(recentState.offset, recentState.total), recentState.hasMore);
+    if (loadMoreRecentBtn) loadMoreRecentBtn.classList.toggle("is-hidden", !recentState.hasMore);
   } catch (_) {}
 }
 
@@ -2135,9 +3307,28 @@ if (recentWishesEl) {
           await navigator.clipboard.writeText(link);
           shareStatus.textContent = "Recent wish link copied: " + link;
         } else {
-          window.prompt("Copy this link", link);
+          if (legacyCopyText(link)) shareStatus.textContent = "Recent wish link copied: " + link;
+          else shareStatus.textContent = "Recent wish link ready: " + link;
         }
       } catch (_) {}
+      return;
+    }
+    if (action === "favorite") {
+      toggleFavoriteRecord(buildFavoriteRecord({
+        id,
+        category: target.dataset.category || "",
+        mood: target.dataset.mood || "",
+        festival: target.dataset.festival || "",
+        friendName: target.dataset.friendName || "",
+        audience: target.dataset.audience || "",
+        views: Number(target.dataset.views || 0),
+        reactions: {
+          love: Number(target.dataset.reactLove || 0),
+          funny: Number(target.dataset.reactFunny || 0),
+          emotional: Number(target.dataset.reactEmotional || 0),
+          romantic: Number(target.dataset.reactRomantic || 0)
+        }
+      }));
       return;
     }
     if (action === "delete") {
@@ -2173,44 +3364,56 @@ if (recentWishesEl) {
 }
 
 if (recentFestivalFilter) {
-  recentFestivalFilter.addEventListener("change", refreshRecentWishes);
+  recentFestivalFilter.addEventListener("change", () => refreshRecentWishesPage(true));
 }
 if (recentAudienceFilter) {
-  recentAudienceFilter.addEventListener("change", refreshRecentWishes);
+  recentAudienceFilter.addEventListener("change", () => refreshRecentWishesPage(true));
+}
+if (recentSortInput) {
+  recentSortInput.addEventListener("change", () => refreshRecentWishesPage(true));
+}
+if (loadMoreRecentBtn) {
+  loadMoreRecentBtn.addEventListener("click", () => refreshRecentWishesPage(false));
 }
 if (recentSearchInput) {
   recentSearchInput.addEventListener("input", () => {
     clearTimeout(window.__recentSearchTimer);
     window.__recentSearchTimer = setTimeout(() => {
-      refreshRecentWishes();
+      refreshRecentWishesPage(true);
     }, 220);
+  });
+}
+
+if (draftImportInput) {
+  draftImportInput.addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      applyImportedDraft(data.draft || data);
+      shareStatus.textContent = "Draft imported.";
+    } catch (_) {
+      shareStatus.textContent = "Draft import failed. Use a valid JSON export.";
+    } finally {
+      draftImportInput.value = "";
+    }
   });
 }
 
 function saveDraft() {
   try {
-    const draft = {
-      category: categoryInput.value || "Festival",
-      mood: moodInput.value || "Celebration",
-      aiTone: aiToneInput.value || "Romantic",
-      audience: audienceInput.value || "friend",
-      senderName: senderInput.value || "",
-      anonymousAlias: anonymousAliasInput.value || "",
-      friendName: nameInput.value || "",
-      festival: festivalInput.value || "Holi",
-      message: messageInput.value || "",
-      music: spotifyInput.value || "",
-      musicStyle: musicStyleInput.value || "",
-      anonymous: !!anonymousInput.checked,
-      theme: themeInput.value || "holi"
-    };
+    const draft = getCurrentDraftData();
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    localStorage.removeItem(LEGACY_DRAFT_KEY);
+    setAutosaveState("Saved", "Draft updated at " + new Date().toLocaleTimeString());
   } catch (_) {}
 }
 
 function clearDraft() {
   try {
     localStorage.removeItem(DRAFT_KEY);
+    localStorage.removeItem(LEGACY_DRAFT_KEY);
   } catch (_) {}
   senderInput.value = "";
   anonymousAliasInput.value = "";
@@ -2218,6 +3421,9 @@ function clearDraft() {
   messageInput.value = "";
   spotifyInput.value = "";
   musicStyleInput.value = "";
+  visibilityInput.value = "public";
+  accessCodeInput.value = "";
+  expiryInput.value = "0";
   anonymousInput.checked = false;
   categoryInput.value = "Festival";
   moodInput.value = "Celebration";
@@ -2227,6 +3433,7 @@ function clearDraft() {
   themeInput.value = "holi";
   applyTheme("holi");
   syncAnonymousUi();
+  syncPrivacyUi();
   syncAudienceUi();
   updateFestivalUi();
   updateCategoryUi();
@@ -2234,6 +3441,8 @@ function clearDraft() {
   updatePreviewCard();
   updateThoughtText();
   tickCountdown();
+  renderBuilderInsights();
+  setAutosaveState("Cleared", "Draft removed from this browser.");
   shareStatus.textContent = "Draft cleared.";
 }
 
@@ -2263,7 +3472,7 @@ function restoreDraftIfNeeded() {
     /\/wish\/[a-zA-Z0-9_-]+/.test(window.location.pathname);
   if (hasPreset) return;
   try {
-    const raw = localStorage.getItem(DRAFT_KEY);
+    const raw = localStorage.getItem(DRAFT_KEY) || localStorage.getItem(LEGACY_DRAFT_KEY);
     if (!raw) return;
     const draft = JSON.parse(raw);
     if (!draft || typeof draft !== "object") return;
@@ -2274,6 +3483,12 @@ function restoreDraftIfNeeded() {
     if (draft.music) spotifyInput.value = String(draft.music);
     if (draft.musicStyle && musicStyleInput.querySelector(`option[value="${draft.musicStyle}"]`)) {
       musicStyleInput.value = draft.musicStyle;
+    }
+    if (draft.visibility && visibilityInput.querySelector(`option[value="${draft.visibility}"]`)) {
+      visibilityInput.value = draft.visibility;
+    }
+    if (draft.expiresInDays && expiryInput.querySelector(`option[value="${draft.expiresInDays}"]`)) {
+      expiryInput.value = draft.expiresInDays;
     }
     if (draft.aiTone && aiToneInput.querySelector(`option[value="${draft.aiTone}"]`)) {
       aiToneInput.value = draft.aiTone;
@@ -2291,17 +3506,18 @@ function restoreDraftIfNeeded() {
     if (draft.festival && festivalInput.querySelector(`option[value="${draft.festival}"]`)) {
       festivalInput.value = draft.festival;
     }
-    if (draft.theme && themeInput.querySelector(`option[value="${draft.theme}"]`)) {
-      themeInput.value = draft.theme;
-      applyTheme(themeInput.value);
-    }
+    themeInput.value = resolveThemeKey(draft.theme);
+    applyTheme(themeInput.value);
     syncAnonymousUi();
+    syncPrivacyUi();
     syncAudienceUi();
     updateFestivalUi();
     updateCategoryUi();
     updateTitle();
     updatePreviewCard();
     tickCountdown();
+    renderBuilderInsights();
+    setAutosaveState("Restored", "Draft restored from local storage.");
   } catch (_) {}
 }
 
@@ -2488,6 +3704,7 @@ musicFile.addEventListener("change", (e) => {
   musicTrack.textContent = f.name;
   musicStatus.textContent = "Local file loaded";
   setSongLabel(f.name, "Custom upload selected", "Upload");
+  renderBuilderInsights();
 });
 
 audio.addEventListener("error", () => {
@@ -3153,11 +4370,13 @@ restoreDraftIfNeeded();
 loadWishByPathIfNeeded();
 loadWishFromQueryIfNeeded();
 configureCreatorSection();
+refreshHealthPulse();
 refreshStats();
 refreshRecentWishes();
 refreshTrendingWishes();
 loadDailyPrompt();
 loadRandomConfession();
+setInterval(refreshHealthPulse, 60000);
 
 // ---------- Confetti particle effect ----------
 const canvas = document.getElementById("fx");
