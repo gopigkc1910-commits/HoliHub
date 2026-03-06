@@ -6,14 +6,76 @@ const path = require("path");
 const fetchImpl = global.fetch || require("node-fetch");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 const WISHES_FILE = path.join(__dirname, "wishes.json");
 const wishesStore = new Map();
 const ADMIN_PIN = (process.env.ADMIN_PIN || "19102006").trim();
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000);
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 80);
+const MAX_WISHES_PER_HOUR_PER_IP = Number(process.env.MAX_WISHES_PER_HOUR_PER_IP || 30);
+const requestRateStore = new Map();
+const wishCreateRateStore = new Map();
 
 let spotifyToken = "";
 let spotifyTokenExp = 0;
 let tokenSource = "none";
+
+const ALLOWED_MOODS = new Set([
+  "Romantic",
+  "Sorry",
+  "Friendship",
+  "Crush",
+  "Funny",
+  "Breakup",
+  "Celebration"
+]);
+const ALLOWED_FESTIVALS = new Set([
+  "Holi",
+  "Diwali",
+  "Christmas",
+  "New Year",
+  "Eid",
+  "Raksha Bandhan"
+]);
+const ALLOWED_THEMES = new Set([
+  "holi",
+  "sunset",
+  "emerald",
+  "royal",
+  "neon-love",
+  "dark-romance",
+  "cute-pastel",
+  "minimal"
+]);
+const ALLOWED_REACTIONS = new Set(["love", "funny", "emotional", "romantic"]);
+const REACTION_LABELS = {
+  love: "Loved it",
+  funny: "Funny",
+  emotional: "Emotional",
+  romantic: "Romantic"
+};
+const DAILY_MOOD_PROMPTS = [
+  { mood: "Friendship", prompt: "Send a card to your best friend today." },
+  { mood: "Romantic", prompt: "Tell someone special how much they matter." },
+  { mood: "Funny", prompt: "Send one joke-style wish to make someone laugh." },
+  { mood: "Sorry", prompt: "Patch up a bond with a sincere apology card." },
+  { mood: "Celebration", prompt: "Celebrate a small win with your circle." },
+  { mood: "Crush", prompt: "Drop a subtle, sweet message to your crush." },
+  { mood: "Breakup", prompt: "Send a healing message to someone moving on." }
+];
+const RANDOM_CONFESSIONS = [
+  "I still check their last seen even after saying I moved on.",
+  "I sent a meme instead of saying sorry. It worked somehow.",
+  "I like someone from my class but never said it.",
+  "I pretend to be chill, but I replay old chats at night.",
+  "I keep screenshots of conversations that made me feel seen.",
+  "I wrote a long apology and deleted it five times before sending.",
+  "I laugh in group chats, but most days I feel invisible.",
+  "I said I was busy, but I was just scared to reply."
+];
+const ANON_PREFIXES = ["Hidden", "Silent", "Midnight", "Velvet", "Mystic", "Secret", "Neon", "Cosmic"];
+const ANON_SUFFIXES = ["Rang", "Splash", "Spark", "Echo", "Whisper", "Glow", "Mask", "Note"];
 
 function sanitizeBrokenProxyEnv() {
   const keys = ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"];
@@ -38,8 +100,47 @@ app.use((req, res, next) => {
 });
 app.use(express.json({ limit: "1mb" }));
 
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    service: "holihub",
+    now: new Date().toISOString()
+  });
+});
+
+function clientKey(req) {
+  const xf = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return xf || req.ip || "unknown";
+}
+
+function bumpRateWindow(store, key, now, windowMs) {
+  const current = store.get(key);
+  if (!current || now - current.windowStart > windowMs) {
+    const next = { windowStart: now, count: 1 };
+    store.set(key, next);
+    return next;
+  }
+  current.count += 1;
+  store.set(key, current);
+  return current;
+}
+
+app.use((req, res, next) => {
+  const now = Date.now();
+  const ip = clientKey(req);
+  const key = `${ip}:${req.method}:${req.path}`;
+  const data = bumpRateWindow(requestRateStore, key, now, RATE_LIMIT_WINDOW_MS);
+  if (data.count > RATE_LIMIT_MAX) {
+    return res.status(429).json({
+      error: "rate_limited",
+      message: "Too many requests. Please retry shortly."
+    });
+  }
+  next();
+});
+
 function makeWishId() {
-  return Math.random().toString(36).slice(2, 8);
+  return Math.random().toString(36).slice(2, 10);
 }
 
 function trimText(value, maxLen) {
@@ -54,6 +155,53 @@ function getProvidedAdminPin(req) {
   return "";
 }
 
+function isSpamText(value) {
+  const v = String(value || "");
+  if (!v) return false;
+  if (/(https?:\/\/|www\.)/i.test(v)) return true;
+  if (/([!?.,])\1{5,}/.test(v)) return true;
+  if (/(.)\1{14,}/.test(v)) return true;
+  return false;
+}
+
+function safePick(value, allowed, fallback) {
+  const v = trimText(value, 60);
+  if (allowed.has(v)) return v;
+  return fallback;
+}
+
+function normalizeReactions(raw) {
+  const base = { love: 0, funny: 0, emotional: 0, romantic: 0 };
+  if (!raw || typeof raw !== "object") return base;
+  for (const k of Object.keys(base)) {
+    base[k] = Math.max(0, Number(raw[k] || 0));
+  }
+  return base;
+}
+
+function randomFrom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function buildAnonymousAlias(rawAlias) {
+  const alias = trimText(rawAlias || "", 40).replace(/\s+/g, " ");
+  if (alias) return alias;
+  return `${randomFrom(ANON_PREFIXES)} ${randomFrom(ANON_SUFFIXES)}`;
+}
+
+function toPublicWish(wish) {
+  const anonymous = !!wish?.anonymous;
+  return {
+    ...wish,
+    senderName: anonymous ? "" : (wish?.senderName || ""),
+    senderDisplayName: anonymous
+      ? buildAnonymousAlias(wish?.anonymousAlias || wish?.senderDisplayName || "")
+      : (wish?.senderName || "Friend"),
+    anonymousAlias: anonymous ? buildAnonymousAlias(wish?.anonymousAlias || wish?.senderDisplayName || "") : "",
+    anonymous
+  };
+}
+
 function loadWishesFromDisk() {
   try {
     if (!fs.existsSync(WISHES_FILE)) return;
@@ -61,7 +209,22 @@ function loadWishesFromDisk() {
     const list = JSON.parse(raw);
     if (!Array.isArray(list)) return;
     for (const wish of list) {
-      if (wish && wish.id) wishesStore.set(String(wish.id), wish);
+      if (!wish || !wish.id) continue;
+      const normalized = {
+        ...wish,
+        category: safePick(wish.category, new Set(["Mood", "Festival"]), "Festival"),
+        mood: safePick(wish.mood, ALLOWED_MOODS, "Celebration"),
+        festival: safePick(wish.festival, ALLOWED_FESTIVALS, "Holi"),
+        theme: safePick(wish.theme, ALLOWED_THEMES, "holi"),
+        anonymous: !!wish.anonymous,
+        anonymousAlias: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : "",
+        views: Number(wish.views || 0),
+        reactions: normalizeReactions(wish.reactions)
+      };
+      normalized.senderDisplayName = normalized.anonymous
+        ? buildAnonymousAlias(normalized.anonymousAlias || normalized.senderDisplayName || "")
+        : (normalized.senderName || "");
+      wishesStore.set(String(normalized.id), normalized);
     }
   } catch (_) {}
 }
@@ -396,28 +559,92 @@ app.get("/api/spotify/health", async (req, res) => {
 });
 
 app.post("/api/wishes", (req, res) => {
+  const now = Date.now();
+  const ip = clientKey(req);
+  const ipBucket = bumpRateWindow(wishCreateRateStore, ip, now, 60 * 60 * 1000);
+  if (ipBucket.count > MAX_WISHES_PER_HOUR_PER_IP) {
+    return res.status(429).json({
+      error: "wish_limit_reached",
+      message: "Wish creation limit reached for this hour."
+    });
+  }
+
   const body = req.body || {};
   let id = makeWishId();
   while (wishesStore.has(id)) id = makeWishId();
-  const festival = trimText(body.festival || "Holi", 40) || "Holi";
+  const category = safePick(body.category, new Set(["Mood", "Festival"]), "Festival");
+  const mood = safePick(body.mood || "Celebration", ALLOWED_MOODS, "Celebration");
+  const festival = safePick(body.festival || "Holi", ALLOWED_FESTIVALS, "Holi");
+  const anonymous = !!body.anonymous;
   const senderName = trimText(body.senderName || "", 80);
+  const anonymousAlias = anonymous ? buildAnonymousAlias(body.anonymousAlias || "") : "";
   const friendName = trimText(body.friendName, 80);
-  const defaultMessage = `Wishing you joy and success. Happy ${festival}${friendName ? ", " + friendName : ""}!`;
+  const contextWord = category === "Mood" ? mood : festival;
+  const defaultMessage = `Wishing you joy and positivity. ${contextWord} vibes${friendName ? " for " + friendName : ""}!`;
+  const message = trimText(body.message || defaultMessage, 400);
+  if (isSpamText(message) || isSpamText(senderName) || isSpamText(friendName) || isSpamText(anonymousAlias)) {
+    return res.status(400).json({
+      error: "spam_detected",
+      message: "Input looks spammy. Remove links or repeated characters."
+    });
+  }
+
   const wish = {
     id,
+    category,
+    mood,
     festival,
     senderName,
+    senderDisplayName: anonymous ? anonymousAlias : senderName,
+    anonymous,
+    anonymousAlias,
     friendName,
-    message: trimText(body.message || defaultMessage, 400),
+    message,
+    aiTone: trimText(body.aiTone || "", 30),
     music: trimText(body.music, 200),
-    theme: trimText(body.theme || "holi", 30) || "holi",
+    musicStyle: trimText(body.musicStyle || "", 40),
+    theme: safePick(body.theme || "holi", ALLOWED_THEMES, "holi"),
     views: 0,
     lastViewedAt: "",
+    reactions: { love: 0, funny: 0, emotional: 0, romantic: 0 },
     createdAt: new Date().toISOString()
   };
   wishesStore.set(id, wish);
   persistWishesToDisk();
-  res.status(201).json({ id, wish });
+  res.status(201).json({ id, wish: toPublicWish(wish) });
+});
+
+app.get("/api/wishes/trending", (req, res) => {
+  const limitRaw = Number(req.query.limit || 8);
+  const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(30, limitRaw)) : 8;
+  const mood = trimText(req.query.mood || "", 40);
+  const festival = trimText(req.query.festival || "", 40);
+  const items = Array.from(wishesStore.values())
+    .filter((wish) => {
+      if (mood && wish.mood !== mood) return false;
+      if (festival && wish.festival !== festival) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const aReacts = Object.values(normalizeReactions(a.reactions)).reduce((s, n) => s + Number(n || 0), 0);
+      const bReacts = Object.values(normalizeReactions(b.reactions)).reduce((s, n) => s + Number(n || 0), 0);
+      const aScore = Number(a.views || 0) * 1.7 + aReacts * 4;
+      const bScore = Number(b.views || 0) * 1.7 + bReacts * 4;
+      return bScore - aScore;
+    })
+    .slice(0, limit)
+    .map((wish) => ({
+      id: wish.id,
+      category: wish.category,
+      mood: wish.mood,
+      festival: wish.festival,
+      friendName: wish.friendName,
+      theme: wish.theme,
+      views: Number(wish.views || 0),
+      reactions: normalizeReactions(wish.reactions),
+      createdAt: wish.createdAt
+    }));
+  return res.json({ items, limit });
 });
 
 app.get("/api/wishes/:id", (req, res) => {
@@ -430,35 +657,76 @@ app.get("/api/wishes/:id", (req, res) => {
   wish.lastViewedAt = new Date().toISOString();
   wishesStore.set(id, wish);
   persistWishesToDisk();
-  return res.json(wish);
+  return res.json(toPublicWish(wish));
+});
+
+app.post("/api/wishes/:id/reactions", (req, res) => {
+  const id = trimText(req.params.id, 40);
+  const wish = wishesStore.get(id);
+  if (!wish) {
+    return res.status(404).json({ error: "wish_not_found" });
+  }
+  const reaction = trimText(req.body?.reaction || "", 20).toLowerCase();
+  if (!ALLOWED_REACTIONS.has(reaction)) {
+    return res.status(400).json({ error: "invalid_reaction" });
+  }
+  const reactions = normalizeReactions(wish.reactions);
+  reactions[reaction] = Number(reactions[reaction] || 0) + 1;
+  wish.reactions = reactions;
+  wishesStore.set(id, wish);
+  persistWishesToDisk();
+  return res.json({
+    ok: true,
+    id,
+    reaction,
+    reactions,
+    labels: REACTION_LABELS
+  });
 });
 
 app.get("/api/wishes", (req, res) => {
   const limitRaw = Number(req.query.limit || 5);
   const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(20, limitRaw)) : 5;
   const festivalFilter = trimText(req.query.festival || "", 40);
+  const moodFilter = trimText(req.query.mood || "", 40);
+  const categoryFilter = trimText(req.query.category || "", 20);
   const q = trimText(req.query.q || "", 80).toLowerCase();
   const items = Array.from(wishesStore.values())
     .filter((wish) => {
       if (festivalFilter && wish.festival !== festivalFilter) return false;
+      if (moodFilter && wish.mood !== moodFilter) return false;
+      if (categoryFilter && wish.category !== categoryFilter) return false;
       if (!q) return true;
-      const text = `${wish.friendName || ""} ${wish.message || ""}`.toLowerCase();
+      const text = `${wish.friendName || ""} ${wish.message || ""} ${wish.festival || ""} ${wish.mood || ""}`.toLowerCase();
       return text.includes(q);
     })
     .sort((a, b) => Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0))
     .slice(0, limit)
     .map((wish) => ({
       id: wish.id,
+      category: wish.category || "Festival",
+      mood: wish.mood || "Celebration",
       festival: wish.festival,
-      senderName: wish.senderName || "",
+      senderName: wish.anonymous ? "" : (wish.senderName || ""),
+      senderDisplayName: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : (wish.senderName || ""),
+      anonymousAlias: wish.anonymous ? buildAnonymousAlias(wish.anonymousAlias || wish.senderDisplayName || "") : "",
       friendName: wish.friendName,
       message: wish.message,
       theme: wish.theme,
       views: Number(wish.views || 0),
+      reactions: normalizeReactions(wish.reactions),
+      anonymous: !!wish.anonymous,
       lastViewedAt: wish.lastViewedAt || "",
       createdAt: wish.createdAt
     }));
-  return res.json({ items, limit, festival: festivalFilter || "", q });
+  return res.json({
+    items,
+    limit,
+    festival: festivalFilter || "",
+    mood: moodFilter || "",
+    category: categoryFilter || "",
+    q
+  });
 });
 
 app.delete("/api/wishes/:id", (req, res) => {
@@ -477,10 +745,14 @@ app.delete("/api/wishes/:id", (req, res) => {
 
 app.post("/api/ai/greeting", async (req, res) => {
   const body = req.body || {};
-  const festival = trimText(body.festival || "Holi", 40) || "Holi";
+  const festival = safePick(body.festival || "Holi", ALLOWED_FESTIVALS, "Holi");
+  const mood = safePick(body.mood || "Celebration", ALLOWED_MOODS, "Celebration");
+  const category = safePick(body.category, new Set(["Mood", "Festival"]), "Festival");
+  const tone = trimText(body.tone || "Warm", 24) || "Warm";
   const friendName = trimText(body.friendName, 80);
-  const prompt = trimText(body.prompt || `Generate a short ${festival} greeting`, 200);
-  const fallbackMessage = `May your life be filled with vibrant colors of happiness and success. Happy ${festival}${friendName ? ", " + friendName : ""}!`;
+  const contextWord = category === "Mood" ? mood : festival;
+  const prompt = trimText(body.prompt || `Generate a short ${tone} message for ${contextWord}`, 220);
+  const fallbackMessage = `Sending ${tone.toLowerCase()} ${contextWord.toLowerCase()} vibes${friendName ? ", " + friendName : ""}.`;
   const hfToken = (process.env.HF_API_TOKEN || "").trim();
 
   try {
@@ -492,7 +764,7 @@ app.post("/api/ai/greeting", async (req, res) => {
         ...(hfToken ? { Authorization: `Bearer ${hfToken}` } : {})
       },
       body: JSON.stringify({
-        inputs: `${prompt}. Keep it warm, concise, and family friendly.`,
+        inputs: `${prompt}. Keep it concise and respectful. Tone: ${tone}.`,
         parameters: { max_new_tokens: 60, temperature: 0.9 }
       })
     });
@@ -515,18 +787,46 @@ app.post("/api/ai/greeting", async (req, res) => {
   }
 });
 
+app.get("/api/confessions/random", (req, res) => {
+  const idx = Math.floor(Math.random() * RANDOM_CONFESSIONS.length);
+  res.json({
+    confession: RANDOM_CONFESSIONS[idx],
+    source: "curated_pool"
+  });
+});
+
+app.get("/api/prompts/daily", (req, res) => {
+  const now = new Date();
+  const seed = Number(
+    `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}${String(now.getUTCDate()).padStart(2, "0")}`
+  );
+  const item = DAILY_MOOD_PROMPTS[seed % DAILY_MOOD_PROMPTS.length];
+  res.json({
+    date: now.toISOString().slice(0, 10),
+    mood: item.mood,
+    prompt: item.prompt
+  });
+});
+
 app.get("/api/stats", (req, res) => {
   const byFestival = {};
+  const byMood = {};
   let totalViews = 0;
+  let totalReactions = 0;
   for (const wish of wishesStore.values()) {
     const f = wish.festival || "Festival";
+    const m = wish.mood || "Celebration";
     byFestival[f] = Number(byFestival[f] || 0) + 1;
+    byMood[m] = Number(byMood[m] || 0) + 1;
     totalViews += Number(wish.views || 0);
+    totalReactions += Object.values(normalizeReactions(wish.reactions)).reduce((s, n) => s + Number(n || 0), 0);
   }
   res.json({
     totalWishes: wishesStore.size,
     totalViews,
-    byFestival
+    totalReactions,
+    byFestival,
+    byMood
   });
 });
 
@@ -538,6 +838,19 @@ app.get(["/spot_search.html", "/spot_search2.html", "/spot_tracks.html"], (req, 
 app.get("/wish/:id", (req, res) => {
   res.sendFile(path.join(__dirname, "happyHoli.html"));
 });
+
+app.get(
+  [
+    "/romantic-message-generator",
+    "/sorry-message-generator",
+    "/friendship-message-generator",
+    "/holi-wishes",
+    "/diwali-wishes"
+  ],
+  (req, res) => {
+    res.sendFile(path.join(__dirname, "happyHoli.html"));
+  }
+);
 
 app.use(express.static(path.join(__dirname)));
 

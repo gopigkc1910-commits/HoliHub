@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FestivalHub Celebration</title>
+<title>Mood & Festival Card Generator</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
@@ -559,6 +559,69 @@ input[type="range"] {
   grid-template-columns: 1fr;
 }
 
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mini-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.anon-panel {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.anon-helper {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.anon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.is-hidden {
+  display: none;
+}
+
+.check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.reaction-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reaction-row button {
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
 .share-row {
   display: flex;
   gap: 10px;
@@ -773,7 +836,29 @@ body.wish-mode #musicSection {
         <h1 id="title"></h1>
         <span class="tag" id="festivalTag">FestivalHub 2026</span>
       </div>
-      <p>Create beautiful festival greetings with music, colors, animation, and mobile-first sharing.</p>
+      <p>Create shareable mood or festival cards with music, reactions, and mobile-first sharing.</p>
+      <div class="choice-grid">
+        <select id="categoryInput" aria-label="Card type">
+          <option value="Mood">Mood Card</option>
+          <option value="Festival" selected>Festival Card</option>
+        </select>
+        <select id="moodInput" aria-label="Mood">
+          <option value="Romantic">Romantic</option>
+          <option value="Sorry">Sorry</option>
+          <option value="Friendship">Friendship</option>
+          <option value="Crush">Crush</option>
+          <option value="Funny">Funny</option>
+          <option value="Breakup">Breakup</option>
+          <option value="Celebration" selected>Celebration</option>
+        </select>
+        <select id="aiToneInput" aria-label="AI tone">
+          <option value="Romantic">Romantic</option>
+          <option value="Funny">Funny</option>
+          <option value="Emotional">Emotional</option>
+          <option value="Apology">Apology</option>
+          <option value="Deep">Deep</option>
+        </select>
+      </div>
       <div class="form-grid" style="margin-top:12px;">
         <input id="senderInput" type="text" placeholder="Your name (sender)">
         <input id="nameInput" type="text" placeholder="Enter friend name">
@@ -783,17 +868,40 @@ body.wish-mode #musicSection {
           <option value="Eid">Eid</option>
           <option value="Christmas">Christmas</option>
           <option value="New Year">New Year</option>
-          <option value="Birthday">Birthday</option>
-          <option value="Independence Day">Independence Day</option>
           <option value="Raksha Bandhan">Raksha Bandhan</option>
         </select>
         <input id="spotifyInput" type="text" placeholder="Music or song query">
+        <select id="musicStyleInput" aria-label="Music style">
+          <option value="">Music style</option>
+          <option value="Romantic">Romantic</option>
+          <option value="Sad">Sad</option>
+          <option value="Lo-fi">Lo-fi</option>
+          <option value="Festival Beats">Festival beats</option>
+        </select>
         <select id="themeInput" aria-label="Theme">
           <option value="holi">Holi Colors</option>
+          <option value="neon-love">Neon Love</option>
+          <option value="royal">Royal Night</option>
+          <option value="dark-romance">Dark Romance</option>
+          <option value="cute-pastel">Cute Pastel</option>
+          <option value="minimal">Minimal</option>
           <option value="sunset">Sunset</option>
           <option value="emerald">Emerald</option>
-          <option value="royal">Royal Night</option>
         </select>
+      </div>
+      <div class="mini-panel">
+        <label class="check-row">
+          <input id="anonymousInput" type="checkbox">
+          <span>Send anonymously</span>
+        </label>
+        <div id="anonymousPanel" class="anon-panel is-hidden">
+          <div class="inline-row">
+            <input id="anonymousAliasInput" type="text" maxlength="40" placeholder="Secret alias recipients will see">
+            <button id="shuffleAliasBtn" type="button">Shuffle Alias</button>
+          </div>
+          <div class="anon-chip">Incognito Mode</div>
+          <div id="anonymousHelper" class="anon-helper">Turn on anonymous mode to hide your name and share with an alias.</div>
+        </div>
       </div>
       <div style="margin-top:10px;">
         <textarea id="messageInput" placeholder="Enter your custom message"></textarea>
@@ -812,6 +920,7 @@ body.wish-mode #musicSection {
       </div>
       <div id="shareStatus" class="meta-line" style="margin-top:10px;">Share link not generated yet.</div>
       <div id="statsLine" class="meta-line"></div>
+      <div id="dailyPrompt" class="meta-line"></div>
       <div class="preview-card" id="previewCard">
         <h3 class="preview-title" id="previewTitle">Happy Holi, Friend!</h3>
         <p class="preview-text" id="previewMessage">Your message preview appears here.</p>
@@ -831,6 +940,13 @@ body.wish-mode #musicSection {
         <p class="preview-text" id="wishMessage">May your day be joyful.</p>
         <div class="preview-meta" id="wishSong">Music: Not selected</div>
         <div class="preview-meta" id="wishViews">Opens: 0</div>
+        <div class="preview-meta" id="wishReactions">Reactions: 0</div>
+        <div class="reaction-row">
+          <button onclick="reactToWish('love')">❤️ Loved it</button>
+          <button onclick="reactToWish('funny')">😂 Funny</button>
+          <button onclick="reactToWish('emotional')">🥺 Emotional</button>
+          <button onclick="reactToWish('romantic')">🔥 Romantic</button>
+        </div>
       </div>
       <div class="controls-row" style="margin-top:10px;">
         <button class="primary" onclick="playGreetingSong()">Play Song</button>
@@ -915,8 +1031,6 @@ body.wish-mode #musicSection {
           <option value="Eid">Eid</option>
           <option value="Christmas">Christmas</option>
           <option value="New Year">New Year</option>
-          <option value="Birthday">Birthday</option>
-          <option value="Independence Day">Independence Day</option>
           <option value="Raksha Bandhan">Raksha Bandhan</option>
         </select>
         <input id="recentSearchInput" type="text" placeholder="Search name or message">
@@ -924,6 +1038,15 @@ body.wish-mode #musicSection {
       </div>
       <div id="recentWishes" class="recent-list">
         <div class="meta-line">No wishes yet. Create one to see it here.</div>
+      </div>
+      <h2 style="margin-top:14px;">Trending Cards Today</h2>
+      <div id="trendingWishes" class="recent-list">
+        <div class="meta-line">Trending cards will appear here.</div>
+      </div>
+      <h2 style="margin-top:14px;">Random Confession</h2>
+      <div id="randomConfession" class="meta-line">Loading...</div>
+      <div class="controls-row" style="margin-top:8px;">
+        <button onclick="loadRandomConfession()">Read Random Confession 👀</button>
       </div>
     </section>
 
@@ -1009,7 +1132,11 @@ const THEME_MAP = {
   holi: ["#ff4d6d", "#ffbe0b", "#00c897", "#219ebc"],
   sunset: ["#f97316", "#fb7185", "#f59e0b", "#38bdf8"],
   emerald: ["#064e3b", "#10b981", "#34d399", "#0f766e"],
-  royal: ["#1e1b4b", "#4c1d95", "#0284c7", "#0f172a"]
+  royal: ["#1e1b4b", "#4c1d95", "#0284c7", "#0f172a"],
+  "neon-love": ["#f43f5e", "#fb7185", "#ec4899", "#7e22ce"],
+  "dark-romance": ["#111827", "#1f2937", "#7f1d1d", "#991b1b"],
+  "cute-pastel": ["#fbcfe8", "#fde68a", "#bfdbfe", "#bbf7d0"],
+  minimal: ["#111827", "#374151", "#6b7280", "#9ca3af"]
 };
 
 const FESTIVAL_EMOJI = {
@@ -1049,21 +1176,21 @@ const THOUGHTS_BY_FESTIVAL = {
     "May this year bring growth, health, and joy.",
     "Wishing you a bright and successful New Year."
   ],
-  "Birthday": [
-    "Wishing you a very happy birthday filled with joy.",
-    "May your year ahead be full of success and smiles.",
-    "Celebrate today and make memories forever."
-  ],
-  "Independence Day": [
-    "Proud to celebrate freedom, unity, and progress.",
-    "Wishing you a meaningful Independence Day.",
-    "Honor the nation with hope and positivity."
-  ],
   "Raksha Bandhan": [
     "Celebrating the beautiful bond of siblings.",
     "Wishing love, care, and lifelong protection.",
     "May this Raksha Bandhan strengthen every bond."
   ]
+};
+
+const THOUGHTS_BY_MOOD = {
+  Romantic: ["Say what your heart has been hiding.", "Small heartfelt lines create big moments."],
+  Sorry: ["A sincere apology can repair more than time can.", "Own it, express it, heal it."],
+  Friendship: ["Good friends deserve random appreciation messages.", "Send warmth to your day-one friend."],
+  Crush: ["Keep it subtle, sweet, and real.", "A little courage can start a story."],
+  Funny: ["Make someone laugh today.", "Humor is a great way to connect."],
+  Breakup: ["Healing messages matter.", "Closure starts with honest words."],
+  Celebration: ["Celebrate the small wins loudly.", "Your people deserve your joy."]
 };
 
 const FALLBACK_AUDIO = [
@@ -1078,15 +1205,29 @@ const titleEl = document.getElementById("title");
 const senderInput = document.getElementById("senderInput");
 const nameInput = document.getElementById("nameInput");
 const messageInput = document.getElementById("messageInput");
+const categoryInput = document.getElementById("categoryInput");
+const moodInput = document.getElementById("moodInput");
+const aiToneInput = document.getElementById("aiToneInput");
 const festivalInput = document.getElementById("festivalInput");
 const themeInput = document.getElementById("themeInput");
 const festivalTag = document.getElementById("festivalTag");
 const spotifyInput = document.getElementById("spotifyInput");
+const musicStyleInput = document.getElementById("musicStyleInput");
+const anonymousInput = document.getElementById("anonymousInput");
+const anonymousPanel = document.getElementById("anonymousPanel");
+const anonymousAliasInput = document.getElementById("anonymousAliasInput");
+const shuffleAliasBtn = document.getElementById("shuffleAliasBtn");
+const anonymousHelper = document.getElementById("anonymousHelper");
 const previewTitle = document.getElementById("previewTitle");
 const previewMessage = document.getElementById("previewMessage");
 const previewMeta = document.getElementById("previewMeta");
+const dailyPromptEl = document.getElementById("dailyPrompt");
+const trendingWishesEl = document.getElementById("trendingWishes");
+const randomConfessionEl = document.getElementById("randomConfession");
 let generatedShareLink = "";
 let activeWishId = "";
+const ANON_PREFIXES = ["Hidden", "Silent", "Midnight", "Velvet", "Mystic", "Secret", "Neon", "Cosmic"];
+const ANON_SUFFIXES = ["Rang", "Splash", "Spark", "Echo", "Whisper", "Glow", "Mask", "Note"];
 
 function normalizeBase(urlLike) {
   if (!urlLike) return "";
@@ -1129,10 +1270,20 @@ function typeTitle(text) {
 
 const nameFromUrl = params.get("name") || "";
 const senderFromUrl = params.get("from") || "";
+const aliasFromUrl = params.get("alias") || "";
+const categoryFromUrl = params.get("category") || "Festival";
+const moodFromUrl = params.get("mood") || "Celebration";
 const festivalFromUrl = params.get("festival") || "Holi";
 const messageFromUrl = params.get("message") || "";
 const themeFromUrl = params.get("theme") || "holi";
+const anonymousFromUrl = params.get("anonymous") === "1";
 
+if (categoryInput.querySelector(`option[value="${categoryFromUrl}"]`)) {
+  categoryInput.value = categoryFromUrl;
+}
+if (moodInput.querySelector(`option[value="${moodFromUrl}"]`)) {
+  moodInput.value = moodFromUrl;
+}
 if (festivalInput.querySelector(`option[value="${festivalFromUrl}"]`)) {
   festivalInput.value = festivalFromUrl;
 }
@@ -1140,10 +1291,14 @@ if (themeInput.querySelector(`option[value="${themeFromUrl}"]`)) {
   themeInput.value = themeFromUrl;
 }
 if (senderFromUrl) senderInput.value = senderFromUrl;
+if (aliasFromUrl) anonymousAliasInput.value = aliasFromUrl;
 if (nameFromUrl) nameInput.value = nameFromUrl;
 if (messageFromUrl) messageInput.value = messageFromUrl;
+if (anonymousFromUrl) anonymousInput.checked = true;
 updateFestivalUi();
+updateCategoryUi();
 applyTheme(themeInput.value);
+syncAnonymousUi();
 updateTitle();
 updatePreviewCard();
 
@@ -1153,6 +1308,19 @@ spotifyInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") loadSpotify();
 });
 
+categoryInput.addEventListener("change", () => {
+  updateCategoryUi();
+  updateTitle();
+  updatePreviewCard();
+  updateThoughtText();
+  saveDraft();
+});
+moodInput.addEventListener("change", () => {
+  updateTitle();
+  updatePreviewCard();
+  updateThoughtText();
+  saveDraft();
+});
 festivalInput.addEventListener("change", () => {
   updateFestivalUi();
   updateThoughtText();
@@ -1183,16 +1351,83 @@ spotifyInput.addEventListener("input", () => {
   updatePreviewCard();
   saveDraft();
 });
+musicStyleInput.addEventListener("change", () => {
+  const style = musicStyleInput.value.trim();
+  if (style && !spotifyInput.value.trim()) {
+    spotifyInput.value = style + " songs";
+  }
+  updatePreviewCard();
+  saveDraft();
+});
+anonymousInput.addEventListener("change", () => {
+  syncAnonymousUi();
+  updatePreviewCard();
+  saveDraft();
+});
+anonymousAliasInput.addEventListener("input", () => {
+  updatePreviewCard();
+  saveDraft();
+});
+shuffleAliasBtn.addEventListener("click", () => {
+  anonymousAliasInput.value = generateAnonymousAlias();
+  syncAnonymousUi();
+  updatePreviewCard();
+  saveDraft();
+});
+
+function randomFrom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function generateAnonymousAlias() {
+  return randomFrom(ANON_PREFIXES) + " " + randomFrom(ANON_SUFFIXES);
+}
+
+function ensureAnonymousAlias(forceRefresh) {
+  if (!anonymousInput.checked) return "";
+  const current = anonymousAliasInput.value.trim().replace(/\s+/g, " ");
+  if (current && !forceRefresh) return current;
+  const next = generateAnonymousAlias();
+  anonymousAliasInput.value = next;
+  return next;
+}
+
+function getSenderDisplayName() {
+  if (anonymousInput.checked) {
+    return ensureAnonymousAlias(false);
+  }
+  return senderInput.value.trim() || "You";
+}
+
+function syncAnonymousUi() {
+  const isAnonymous = !!anonymousInput.checked;
+  if (anonymousPanel) anonymousPanel.classList.toggle("is-hidden", !isAnonymous);
+  senderInput.disabled = isAnonymous;
+  senderInput.placeholder = isAnonymous ? "Your name stays hidden in anonymous mode" : "Your name (sender)";
+  anonymousAliasInput.disabled = !isAnonymous;
+  shuffleAliasBtn.disabled = !isAnonymous;
+  const alias = isAnonymous ? ensureAnonymousAlias(false) : "";
+  if (anonymousHelper) {
+    anonymousHelper.textContent = isAnonymous
+      ? `Recipients will only see "${alias}". Your real name will not be shared in the link or greeting.`
+      : "Turn on anonymous mode to hide your name and share with an alias.";
+  }
+}
 
 function updateTitle() {
+  const category = categoryInput.value || "Festival";
+  const mood = moodInput.value || "Celebration";
   const n = nameInput.value.trim();
   const f = festivalInput.value || "Festival";
-  document.title = f + " Greeting | FestivalHub";
+  const context = category === "Mood" ? mood : f;
+  document.title = context + " Card | FestivalHub";
   if (n) {
-    titleEl.textContent = "Happy " + f + ", " + n + "!";
+    titleEl.textContent = category === "Mood"
+      ? mood + " card for " + n
+      : "Happy " + f + ", " + n + "!";
     return;
   }
-  typeTitle("Create a " + f + " Greeting");
+  typeTitle("Create a " + context + " Card");
 }
 
 function updateFestivalUi() {
@@ -1200,19 +1435,36 @@ function updateFestivalUi() {
   festivalTag.textContent = f + " Edition";
 }
 
+function updateCategoryUi() {
+  const isMood = categoryInput.value === "Mood";
+  moodInput.style.display = "block";
+  festivalInput.style.display = "block";
+  moodInput.disabled = !isMood;
+  festivalInput.disabled = isMood;
+  festivalTag.textContent = isMood
+    ? (moodInput.value || "Mood") + " Mode"
+    : (festivalInput.value || "Festival") + " Edition";
+}
+
 function updatePreviewCard() {
+  const category = categoryInput.value || "Festival";
+  const mood = moodInput.value || "Celebration";
   const festival = festivalInput.value || "Festival";
-  const emoji = FESTIVAL_EMOJI[festival] || "🎉";
+  const context = category === "Mood" ? mood : festival;
+  const emoji = category === "Mood" ? "🎭" : (FESTIVAL_EMOJI[festival] || "🎉");
   const friend = nameInput.value.trim() || "Friend";
-  const sender = senderInput.value.trim() || "You";
-  const msg = messageInput.value.trim() || ("Wishing you joy and success. Happy " + festival + "!");
+  const sender = getSenderDisplayName();
+  const msg = messageInput.value.trim() || ("Sending " + context + " vibes to you!");
   const song = spotifyInput.value.trim() || "Not selected";
-  if (previewTitle) previewTitle.textContent = emoji + " Happy " + festival + ", " + friend + "!";
+  if (previewTitle) previewTitle.textContent = emoji + " " + context + " card for " + friend;
   if (previewMessage) previewMessage.textContent = "\"" + msg + "\"";
-  if (previewMeta) previewMeta.textContent = "From: " + sender + " | Music: " + song;
+  if (previewMeta) previewMeta.textContent = "From: " + sender + " | Music: " + song + " | Theme: " + (themeInput.value || "holi");
 }
 
 function getFestivalThoughts() {
+  if (categoryInput.value === "Mood") {
+    return THOUGHTS_BY_MOOD[moodInput.value] || THOUGHTS_BY_MOOD.Celebration;
+  }
   return THOUGHTS_BY_FESTIVAL[festivalInput.value] || THOUGHTS_BY_FESTIVAL.Holi;
 }
 
@@ -1280,6 +1532,69 @@ function sanitizeShareBase() {
   return window.location.origin;
 }
 
+function buildFallbackWishLink(base, payload) {
+  const url = new URL(base + "/");
+  url.searchParams.set("mode", "wish");
+  url.searchParams.set("category", payload.category);
+  url.searchParams.set("mood", payload.mood);
+  url.searchParams.set("festival", payload.festival);
+  if (!payload.anonymous && payload.senderName) url.searchParams.set("from", payload.senderName);
+  if (payload.anonymous) url.searchParams.set("anonymous", "1");
+  if (payload.anonymousAlias) url.searchParams.set("alias", payload.anonymousAlias);
+  if (payload.friendName) url.searchParams.set("name", payload.friendName);
+  if (payload.message) url.searchParams.set("message", payload.message);
+  if (payload.music) url.searchParams.set("song", payload.music);
+  if (payload.theme) url.searchParams.set("theme", payload.theme);
+  return url.toString();
+}
+
+function renderWishGreeting(data) {
+  document.body.classList.add("wish-mode");
+  if (data.category && categoryInput.querySelector(`option[value="${data.category}"]`)) {
+    categoryInput.value = data.category;
+  }
+  if (data.mood && moodInput.querySelector(`option[value="${data.mood}"]`)) {
+    moodInput.value = data.mood;
+  }
+  festivalInput.value = data.festival || "Holi";
+  senderInput.value = data.senderName || "";
+  anonymousInput.checked = !!data.anonymous;
+  anonymousAliasInput.value = data.anonymousAlias || data.senderDisplayName || "";
+  nameInput.value = data.friendName || "";
+  messageInput.value = data.message || "";
+  spotifyInput.value = data.music || "";
+  if (data.theme && themeInput.querySelector(`option[value="${data.theme}"]`)) {
+    themeInput.value = data.theme;
+    applyTheme(themeInput.value);
+  }
+  syncAnonymousUi();
+  updateFestivalUi();
+  updateCategoryUi();
+  updateTitle();
+  updatePreviewCard();
+
+  const wishTitle = document.getElementById("wishTitle");
+  const wishFrom = document.getElementById("wishFrom");
+  const wishMessage = document.getElementById("wishMessage");
+  const wishSong = document.getElementById("wishSong");
+  const wishViews = document.getElementById("wishViews");
+  const wishReactions = document.getElementById("wishReactions");
+  const wishOpenTitle = document.getElementById("wishOpenTitle");
+  const emoji = data.category === "Mood" ? "🎭" : (FESTIVAL_EMOJI[data.festival] || "🎉");
+  const contextWord = data.category === "Mood" ? (data.mood || "Mood") : (data.festival || "Festival");
+  const senderDisplay = data.senderDisplayName || (data.anonymous ? (data.anonymousAlias || "Someone") : (data.senderName || "Friend"));
+  const views = Number(data.views || 0);
+  const viewsLabel = views === 1 ? "person" : "people";
+  const reactionTotal = Object.values(data.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
+  if (wishOpenTitle) wishOpenTitle.textContent = contextWord + " Greeting";
+  if (wishTitle) wishTitle.textContent = emoji + " " + contextWord + " card for " + (data.friendName || "Friend");
+  if (wishFrom) wishFrom.textContent = "Message from " + senderDisplay;
+  if (wishMessage) wishMessage.textContent = "\"" + (data.message || "Wishing you joy and happiness.") + "\"";
+  if (wishSong) wishSong.textContent = "Music: " + (data.music || "Not selected");
+  if (wishViews) wishViews.textContent = "👀 " + views + " " + viewsLabel + " viewed this greeting";
+  if (wishReactions) wishReactions.textContent = "Reactions: " + reactionTotal;
+}
+
 async function generateLink() {
   const base = sanitizeShareBase();
   if (!base) {
@@ -1288,15 +1603,25 @@ async function generateLink() {
   }
 
   const selectedFestival = festivalInput.value || "Holi";
+  const selectedCategory = categoryInput.value || "Festival";
+  const selectedMood = moodInput.value || "Celebration";
   const selectedSender = senderInput.value.trim();
+  const selectedAlias = anonymousInput.checked ? ensureAnonymousAlias(false) : "";
   const selectedName = nameInput.value.trim();
-  const selectedMessage = messageInput.value.trim() || ("Wishing you joy and success. Happy " + selectedFestival + (selectedName ? ", " + selectedName : "") + "!");
+  const contextWord = selectedCategory === "Mood" ? selectedMood : selectedFestival;
+  const selectedMessage = messageInput.value.trim() || ("Sending " + contextWord + " vibes" + (selectedName ? ", " + selectedName : "") + "!");
   const payload = {
+    category: selectedCategory,
+    mood: selectedMood,
     festival: selectedFestival,
     senderName: selectedSender,
+    anonymous: !!anonymousInput.checked,
+    anonymousAlias: selectedAlias,
     friendName: selectedName,
     message: selectedMessage,
     music: spotifyInput.value.trim(),
+    musicStyle: musicStyleInput.value || "",
+    aiTone: aiToneInput.value || "",
     theme: themeInput.value || "holi"
   };
 
@@ -1312,22 +1637,14 @@ async function generateLink() {
     const finalBase = normalizeBase(base);
     generatedShareLink = finalBase + "/wish/" + data.id;
   } catch (_) {
-    const fallbackId = Math.random().toString(36).slice(2, 8);
-    const url = new URL(base + "/");
-    url.pathname = "/wish/" + fallbackId;
-    url.searchParams.set("festival", payload.festival);
-    if (payload.senderName) url.searchParams.set("from", payload.senderName);
-    if (payload.friendName) url.searchParams.set("name", payload.friendName);
-    if (payload.message) url.searchParams.set("message", payload.message);
-    if (payload.music) url.searchParams.set("song", payload.music);
-    if (payload.theme) url.searchParams.set("theme", payload.theme);
-    generatedShareLink = url.toString();
+    generatedShareLink = buildFallbackWishLink(base, payload);
   }
 
   shareStatus.textContent = "Share link ready: " + generatedShareLink;
   await copyShareLink();
   refreshStats();
   refreshRecentWishes();
+  refreshTrendingWishes();
   saveDraft();
 }
 
@@ -1368,40 +1685,33 @@ async function loadWishByPathIfNeeded() {
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
-    document.body.classList.add("wish-mode");
     activeWishId = id;
-    festivalInput.value = data.festival || "Holi";
-    senderInput.value = data.senderName || "";
-    nameInput.value = data.friendName || "";
-    messageInput.value = data.message || "";
-    spotifyInput.value = data.music || "";
-    if (data.theme && themeInput.querySelector(`option[value="${data.theme}"]`)) {
-      themeInput.value = data.theme;
-      applyTheme(themeInput.value);
-    }
-    updateFestivalUi();
-    updateTitle();
-    updatePreviewCard();
     generatedShareLink = window.location.origin + "/wish/" + id;
-    if (data.message) messageInput.value = data.message;
-    const wishTitle = document.getElementById("wishTitle");
-    const wishFrom = document.getElementById("wishFrom");
-    const wishMessage = document.getElementById("wishMessage");
-    const wishSong = document.getElementById("wishSong");
-    const wishViews = document.getElementById("wishViews");
-    const wishOpenTitle = document.getElementById("wishOpenTitle");
-    const emoji = FESTIVAL_EMOJI[data.festival] || "🎉";
-    const views = Number(data.views || 0);
-    const viewsLabel = views === 1 ? "person" : "people";
-    if (wishOpenTitle) wishOpenTitle.textContent = (data.festival || "Festival") + " Greeting";
-    if (wishTitle) wishTitle.textContent = emoji + " Happy " + (data.festival || "Festival") + ", " + (data.friendName || "Friend") + "!";
-    if (wishFrom) wishFrom.textContent = "Message from " + (data.senderName || "Friend");
-    if (wishMessage) wishMessage.textContent = "\"" + (data.message || "Wishing you joy and happiness.") + "\"";
-    if (wishSong) wishSong.textContent = "Music: " + (data.music || "Not selected");
-    if (wishViews) wishViews.textContent = "👀 " + views + " " + viewsLabel + " viewed this greeting";
+    renderWishGreeting(data);
     colorSplashAnimation();
     fireworks();
   } catch (_) {}
+}
+
+function loadWishFromQueryIfNeeded() {
+  if (params.get("mode") !== "wish") return;
+  activeWishId = "";
+  generatedShareLink = window.location.href;
+  renderWishGreeting({
+    category: categoryInput.value || "Festival",
+    mood: moodInput.value || "Celebration",
+    festival: festivalInput.value || "Holi",
+    senderName: anonymousInput.checked ? "" : senderInput.value.trim(),
+    senderDisplayName: anonymousInput.checked ? ensureAnonymousAlias(false) : (senderInput.value.trim() || "Friend"),
+    anonymous: !!anonymousInput.checked,
+    anonymousAlias: anonymousAliasInput.value.trim(),
+    friendName: nameInput.value.trim(),
+    message: messageInput.value.trim(),
+    music: spotifyInput.value.trim(),
+    theme: themeInput.value || "holi",
+    views: 0,
+    reactions: {}
+  });
 }
 
 function playGreetingSong() {
@@ -1416,8 +1726,12 @@ function playGreetingSong() {
 function remixGreeting() {
   const root = window.location.origin + "/";
   const url = new URL(root);
+  url.searchParams.set("category", categoryInput.value || "Festival");
+  url.searchParams.set("mood", moodInput.value || "Celebration");
   url.searchParams.set("festival", festivalInput.value || "Holi");
-  if (senderInput.value.trim()) url.searchParams.set("from", senderInput.value.trim());
+  if (!anonymousInput.checked && senderInput.value.trim()) url.searchParams.set("from", senderInput.value.trim());
+  if (anonymousInput.checked) url.searchParams.set("anonymous", "1");
+  if (anonymousInput.checked && anonymousAliasInput.value.trim()) url.searchParams.set("alias", anonymousAliasInput.value.trim());
   if (nameInput.value.trim()) url.searchParams.set("name", nameInput.value.trim());
   if (messageInput.value.trim()) url.searchParams.set("message", messageInput.value.trim());
   if (spotifyInput.value.trim()) url.searchParams.set("song", spotifyInput.value.trim());
@@ -1441,8 +1755,107 @@ async function refreshStats() {
     const res = await fetch(endpoint.toString());
     if (!res.ok) return;
     const data = await res.json();
-    statsLine.textContent = "Total wishes: " + Number(data.totalWishes || 0) + " | Total opens: " + Number(data.totalViews || 0);
+    statsLine.textContent = "Total wishes: " + Number(data.totalWishes || 0) + " | Total opens: " + Number(data.totalViews || 0) + " | Reactions: " + Number(data.totalReactions || 0);
   } catch (_) {}
+}
+
+async function reactToWish(reaction) {
+  if (!activeWishId) {
+    shareStatus.textContent = "Open a card first to react.";
+    return;
+  }
+  try {
+    const endpoint = new URL("/api/wishes/" + encodeURIComponent(activeWishId) + "/reactions", activeApiBase);
+    const res = await fetch(endpoint.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reaction })
+    });
+    if (!res.ok) {
+      shareStatus.textContent = "Reaction failed. Try again.";
+      return;
+    }
+    const data = await res.json();
+    const total = Object.values(data.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
+    const wishReactions = document.getElementById("wishReactions");
+    if (wishReactions) wishReactions.textContent = "Reactions: " + total;
+    shareStatus.textContent = "Reaction added: " + reaction;
+  } catch (_) {
+    shareStatus.textContent = "Reaction failed. Check connection.";
+  }
+}
+
+function renderTrending(items) {
+  if (!trendingWishesEl) return;
+  if (!items || !items.length) {
+    trendingWishesEl.innerHTML = "<div class=\"meta-line\">No trending cards yet.</div>";
+    return;
+  }
+  trendingWishesEl.innerHTML = "";
+  items.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "recent-item";
+    const main = document.createElement("div");
+    main.className = "recent-main";
+    const title = document.createElement("div");
+    title.className = "recent-title";
+    const sub = document.createElement("div");
+    sub.className = "recent-sub";
+    const openBtn = document.createElement("button");
+    const context = item.category === "Mood" ? (item.mood || "Mood") : (item.festival || "Festival");
+    const reacts = Object.values(item.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
+    title.textContent = context + (item.friendName ? " for " + item.friendName : "");
+    sub.textContent = "Views: " + Number(item.views || 0) + " | Reactions: " + reacts;
+    openBtn.textContent = "Open";
+    openBtn.onclick = () => {
+      const link = publicWishLink(item.id);
+      if (link) window.open(link, "_blank");
+    };
+    main.appendChild(title);
+    main.appendChild(sub);
+    row.appendChild(main);
+    row.appendChild(openBtn);
+    trendingWishesEl.appendChild(row);
+  });
+}
+
+async function refreshTrendingWishes() {
+  try {
+    const endpoint = new URL("/api/wishes/trending", activeApiBase);
+    endpoint.searchParams.set("limit", "6");
+    const res = await fetch(endpoint.toString());
+    if (!res.ok) return;
+    const data = await res.json();
+    renderTrending(data.items || []);
+  } catch (_) {}
+}
+
+async function loadDailyPrompt() {
+  if (!dailyPromptEl) return;
+  try {
+    const endpoint = new URL("/api/prompts/daily", activeApiBase);
+    const res = await fetch(endpoint.toString());
+    if (!res.ok) return;
+    const data = await res.json();
+    dailyPromptEl.textContent = "Today's Mood Prompt (" + data.date + "): " + data.mood + " - " + data.prompt;
+  } catch (_) {}
+}
+
+async function loadRandomConfession() {
+  if (!randomConfessionEl) return;
+  randomConfessionEl.textContent = "Loading...";
+  try {
+    const endpoint = new URL("/api/confessions/random", activeApiBase);
+    const res = await fetch(endpoint.toString());
+    if (!res.ok) {
+      randomConfessionEl.textContent = "Confession unavailable right now.";
+      return;
+    }
+    const data = await res.json();
+    randomConfessionEl.textContent = "👀 " + (data.confession || "No confession found.");
+  } catch (_) {
+    randomConfessionEl.textContent = "Confession unavailable right now.";
+  }
 }
 
 function getPublicWishBase() {
@@ -1500,12 +1913,14 @@ function renderRecentWishes(items) {
     deleteBtn.textContent = "Delete";
     deleteBtn.className = "danger-btn";
 
-    const title = (item.festival || "Festival") + (item.friendName ? (" for " + item.friendName) : "");
+    const context = item.category === "Mood" ? (item.mood || "Mood") : (item.festival || "Festival");
+    const title = context + (item.friendName ? (" for " + item.friendName) : "");
+    const reactions = Object.values(item.reactions || {}).reduce((s, n) => s + Number(n || 0), 0);
     const messageSnippet = (item.message || "").slice(0, 60);
     titleElx.textContent = title;
     subMsg.textContent = messageSnippet + (messageSnippet.length === 60 ? "..." : "");
     subDate.textContent = fmtShortDate(item.createdAt);
-    subViews.textContent = "Opens: " + Number(item.views || 0);
+    subViews.textContent = "Opens: " + Number(item.views || 0) + " | Reactions: " + reactions;
 
     actions.appendChild(openBtn);
     actions.appendChild(copyBtn);
@@ -1523,9 +1938,13 @@ function renderRecentWishes(items) {
 async function refreshRecentWishes() {
   try {
     const endpoint = new URL("/api/wishes", activeApiBase);
-    endpoint.searchParams.set("limit", "5");
+    endpoint.searchParams.set("limit", "8");
     if (recentFestivalFilter && recentFestivalFilter.value) {
       endpoint.searchParams.set("festival", recentFestivalFilter.value);
+    }
+    if (categoryInput.value === "Mood" && moodInput.value) {
+      endpoint.searchParams.set("category", "Mood");
+      endpoint.searchParams.set("mood", moodInput.value);
     }
     const q = (recentSearchInput && recentSearchInput.value || "").trim();
     if (q) endpoint.searchParams.set("q", q);
@@ -1607,11 +2026,17 @@ if (recentSearchInput) {
 function saveDraft() {
   try {
     const draft = {
+      category: categoryInput.value || "Festival",
+      mood: moodInput.value || "Celebration",
+      aiTone: aiToneInput.value || "Romantic",
       senderName: senderInput.value || "",
+      anonymousAlias: anonymousAliasInput.value || "",
       friendName: nameInput.value || "",
       festival: festivalInput.value || "Holi",
       message: messageInput.value || "",
       music: spotifyInput.value || "",
+      musicStyle: musicStyleInput.value || "",
+      anonymous: !!anonymousInput.checked,
       theme: themeInput.value || "holi"
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -1623,13 +2048,21 @@ function clearDraft() {
     localStorage.removeItem(DRAFT_KEY);
   } catch (_) {}
   senderInput.value = "";
+  anonymousAliasInput.value = "";
   nameInput.value = "";
   messageInput.value = "";
   spotifyInput.value = "";
+  musicStyleInput.value = "";
+  anonymousInput.checked = false;
+  categoryInput.value = "Festival";
+  moodInput.value = "Celebration";
+  aiToneInput.value = "Romantic";
   festivalInput.value = "Holi";
   themeInput.value = "holi";
   applyTheme("holi");
+  syncAnonymousUi();
   updateFestivalUi();
+  updateCategoryUi();
   updateTitle();
   updatePreviewCard();
   updateThoughtText();
@@ -1654,6 +2087,7 @@ function setAdminPinInSession(pin) {
 function restoreDraftIfNeeded() {
   const hasPreset =
     !!params.get("name") ||
+    !!params.get("mode") ||
     !!params.get("message") ||
     !!params.get("festival") ||
     !!params.get("song") ||
@@ -1666,9 +2100,23 @@ function restoreDraftIfNeeded() {
     const draft = JSON.parse(raw);
     if (!draft || typeof draft !== "object") return;
     if (draft.senderName) senderInput.value = String(draft.senderName);
+    if (draft.anonymousAlias) anonymousAliasInput.value = String(draft.anonymousAlias);
     if (draft.friendName) nameInput.value = String(draft.friendName);
     if (draft.message) messageInput.value = String(draft.message);
     if (draft.music) spotifyInput.value = String(draft.music);
+    if (draft.musicStyle && musicStyleInput.querySelector(`option[value="${draft.musicStyle}"]`)) {
+      musicStyleInput.value = draft.musicStyle;
+    }
+    if (draft.aiTone && aiToneInput.querySelector(`option[value="${draft.aiTone}"]`)) {
+      aiToneInput.value = draft.aiTone;
+    }
+    if (draft.category && categoryInput.querySelector(`option[value="${draft.category}"]`)) {
+      categoryInput.value = draft.category;
+    }
+    if (draft.mood && moodInput.querySelector(`option[value="${draft.mood}"]`)) {
+      moodInput.value = draft.mood;
+    }
+    anonymousInput.checked = !!draft.anonymous;
     if (draft.festival && festivalInput.querySelector(`option[value="${draft.festival}"]`)) {
       festivalInput.value = draft.festival;
     }
@@ -1676,7 +2124,9 @@ function restoreDraftIfNeeded() {
       themeInput.value = draft.theme;
       applyTheme(themeInput.value);
     }
+    syncAnonymousUi();
     updateFestivalUi();
+    updateCategoryUi();
     updateTitle();
     updatePreviewCard();
     tickCountdown();
@@ -1684,25 +2134,31 @@ function restoreDraftIfNeeded() {
 }
 
 async function generateAiMessage() {
+  const category = categoryInput.value || "Festival";
+  const mood = moodInput.value || "Celebration";
   const festival = festivalInput.value || "Holi";
+  const tone = aiToneInput.value || "Romantic";
   const friendName = nameInput.value.trim();
-  const prompt = "Generate a warm " + festival + " greeting message" + (friendName ? (" for " + friendName) : "");
+  const contextWord = category === "Mood" ? mood : festival;
+  const prompt = "Generate a " + tone + " " + contextWord + " message" + (friendName ? (" for " + friendName) : "");
   try {
     const endpoint = new URL("/api/ai/greeting", activeApiBase);
     const res = await fetch(endpoint.toString(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, festival, friendName })
+      body: JSON.stringify({ prompt, category, mood, festival, tone, friendName })
     });
     if (!res.ok) throw new Error("ai_failed");
     const data = await res.json();
     messageInput.value = data.message || "";
     thoughtEl.textContent = "\"" + (data.message || "Wishing you joy and success.") + "\"";
   } catch (_) {
-    const fallback = "Wishing you joy, peace, and success. Happy " + festival + (friendName ? ", " + friendName : "") + "!";
+    const fallback = "Sending " + tone.toLowerCase() + " " + contextWord.toLowerCase() + " vibes" + (friendName ? ", " + friendName : "") + "!";
     messageInput.value = fallback;
     thoughtEl.textContent = "\"" + fallback + "\"";
   }
+  updatePreviewCard();
+  saveDraft();
 }
 
 // ---------- Countdown ----------
@@ -1718,6 +2174,10 @@ function nextFestivalTs(festival) {
 const countdownEl = document.getElementById("countdown");
 
 function tickCountdown() {
+  if (categoryInput.value === "Mood") {
+    countdownEl.textContent = "Mood cards are always live. Share one today.";
+    return;
+  }
   const festival = festivalInput.value || "Holi";
   const eventTime = nextFestivalTs(festival);
   if (!eventTime) {
@@ -2517,9 +2977,13 @@ if (params.get("spotify")) {
 checkSpotifyBackendHealth();
 restoreDraftIfNeeded();
 loadWishByPathIfNeeded();
+loadWishFromQueryIfNeeded();
 configureCreatorSection();
 refreshStats();
 refreshRecentWishes();
+refreshTrendingWishes();
+loadDailyPrompt();
+loadRandomConfession();
 
 // ---------- Confetti particle effect ----------
 const canvas = document.getElementById("fx");
@@ -2611,21 +3075,36 @@ window.addEventListener("load", () => {
 
 // ---------- Download wish card ----------
 function downloadImage() {
-  if (!window.html2canvas) {
-    alert("Please wait a moment and try again.");
-    return;
-  }
-  window.html2canvas(document.body).then((c) => {
+  ensureHtml2Canvas().then(() => {
+    if (!window.html2canvas) {
+      alert("Could not load image exporter. Try again.");
+      return;
+    }
+    return window.html2canvas(document.body);
+  }).then((c) => {
+    if (!c) return;
     const a = document.createElement("a");
     a.download = "happy-holi-wish.png";
     a.href = c.toDataURL("image/png");
     a.click();
+  }).catch(() => {
+    alert("Image export failed. Please retry.");
   });
 }
 
-const html2CanvasScript = document.createElement("script");
-html2CanvasScript.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-document.body.appendChild(html2CanvasScript);
+let html2CanvasPromise = null;
+function ensureHtml2Canvas() {
+  if (window.html2canvas) return Promise.resolve();
+  if (html2CanvasPromise) return html2CanvasPromise;
+  html2CanvasPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+    script.onload = resolve;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+  return html2CanvasPromise;
+}
 
 // 3D credit tilt effect
 const credit3d = document.getElementById("credit3d");
